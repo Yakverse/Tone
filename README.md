@@ -1,2 +1,2 @@
-<h1 align="center">🎵 Tune</h1>
+<h1 align="center">🎵 Tone</h1>
 <p align="center">🎶 Bot de música para discord</p>
