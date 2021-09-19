@@ -1,12 +1,13 @@
 import { Client, Intents } from "discord.js";
 import { Event } from "../event/event";
+import { typeSlashCommand } from "./typeSlashCommand.enum";
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 
 export class Bot {
 
     client: Client = new Client({ 
-        intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
+        intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES],
         presence: {
             status: 'online',
             activities: [
@@ -48,8 +49,36 @@ export class Bot {
                             description: "teste"
                         },
                         {
-                            name: 'teste',
-                            description: 'dsadsadsa'
+                            name: 'play',
+                            description: 'Play a song',
+                            options: [
+                                {
+                                    name: 'song',
+                                    type: typeSlashCommand.STRING,
+                                    description: 'URL or name of the song',
+                                    required: true
+                                }
+                            ]
+                        },
+                        {
+                            name: 'leave',
+                            description: 'Leave the voice channel'
+                        },
+                        {
+                            name: 'skip',
+                            description: 'Skip the song'
+                        },
+                        {
+                            name: 'pause',
+                            description: 'Pause the song'
+                        },
+                        {
+                            name: 'resume',
+                            description: 'Resume the song'
+                        },
+                        {
+                            name: 'stop',
+                            description: 'Stop the song and clear queue'
                         }
                     ]
                 }
