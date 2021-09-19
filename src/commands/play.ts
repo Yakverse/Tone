@@ -1,4 +1,4 @@
-import { joinVoiceChannel } from "@discordjs/voice";
+import { AudioPlayerStatus, joinVoiceChannel } from "@discordjs/voice";
 import { CommandInteraction, GuildMember, Message } from "discord.js";
 import { Command } from "./command";
 import CommandMusic from "./music_utils/commandMusic";
@@ -32,7 +32,7 @@ export default class Play implements Command {
 
             if (this.commandMusic.getVoiceConnection) {
                 this.commandMusic.addQueue(url)
-                if (this.commandMusic.queue.length !== 0) message.reply('Added to queue')
+                if (this.commandMusic.audioPlayer.state.status === AudioPlayerStatus.Playing) message.reply('Added to queue')
                 else message.reply('Playing')
                 return
             }
