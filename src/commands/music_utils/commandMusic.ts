@@ -1,6 +1,6 @@
 import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, VoiceConnection } from "@discordjs/voice";
 import Track from "./track";
-import { getInfo } from 'ytdl-core';
+import {getInfo} from 'ytdl-core';
 // import { promisify } from 'util';
 
 // const wait = promisify(setTimeout);
@@ -37,7 +37,7 @@ export default class CommandMusic {
     async addQueue(url: string): Promise<string>{
         let info = await getInfo(url)
         this.queue.push(new Track(url, info.videoDetails.title))
-        this.processQueue()
+        await this.processQueue()
         return info.videoDetails.title
     }
 

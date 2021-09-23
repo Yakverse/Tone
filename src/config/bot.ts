@@ -19,7 +19,7 @@ export class Bot {
         }
     });
     event: Event = new Event(this.client)
- 
+
     constructor(private token: string | undefined){
         if (!token) throw new Error("Invalid token");
         
