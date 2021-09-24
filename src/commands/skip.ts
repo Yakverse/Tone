@@ -1,6 +1,7 @@
-import { CommandInteraction, Message } from "discord.js";
+import {CommandInteraction, GuildMember, Message} from "discord.js";
 import { Command } from "./command";
 import CommandMusic from "./music_utils/commandMusic";
+import Track from "./music_utils/track";
 
 export default class Skip implements Command {
 
@@ -14,13 +15,18 @@ export default class Skip implements Command {
     }
 
     execute(message: Message | CommandInteraction) {
-        if (!this.commandMusic.getVoiceConnection){
-            message.reply('I\'m not in a voice channel')
-            return
-        }
+        if (message.member instanceof GuildMember && message.member.voice.channel) {
+            const guildId: string = message.member.guild.id
+            let track: Track | undefined = this.commandMusic.queue.get(guildId)
+            if (!track) return;
+            if (!track.voiceConnection) {
+                message.reply('I\'m not in a voice channel')
+                return
+            }
 
-        this.commandMusic.audioPlayer.stop()
-        message.reply('Skipped')
+            track.audioPlayer.stop()
+            message.reply('Skipped')
+        }
     }
     
 }
