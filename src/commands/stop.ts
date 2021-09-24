@@ -8,11 +8,8 @@ export default class Skip implements Command {
     name: string = 'stop'
     description: string = 'Stop the song and clear queue'
     options: Array<string> = []
-    commandMusic: CommandMusic
 
-    constructor(commandMusic: CommandMusic){
-        this.commandMusic = commandMusic
-    }
+    constructor(public commandMusic: CommandMusic){}
 
     execute(message: Message | CommandInteraction) {
         if (message.member instanceof GuildMember && message.member.voice.channel) {
@@ -24,8 +21,7 @@ export default class Skip implements Command {
                 return
             }
 
-            track.audios = []
-            track.audioPlayer.stop()
+            this.commandMusic.stop(guildId)
             message.reply('Stop')
         }
     }

@@ -1,15 +1,15 @@
-import {CommandInteraction, GuildMember, Message} from "discord.js";
-import { Command } from "./command";
+import {Command} from "./command";
 import CommandMusic from "./music_utils/commandMusic";
-import {VoiceConnection} from "@discordjs/voice";
+import {CommandInteraction, GuildMember, Message} from "discord.js";
 import Track from "./music_utils/track";
+import {VoiceConnection} from "@discordjs/voice";
 
-export default class Leave implements Command {
-    
-    name: string = 'leave'
-    description: string = 'Leave the voice channel'
+export default class Loop implements Command {
+
+    name: string = 'loop'
+    description: string = 'loop the song'
     options: Array<string> = []
-    
+
     constructor(public commandMusic: CommandMusic){}
 
     execute(message: Message | CommandInteraction) {
@@ -22,15 +22,13 @@ export default class Leave implements Command {
             }
             let voiceConnection: VoiceConnection = track!.voiceConnection
             if (voiceConnection.joinConfig.channelId === message.member.voice.channel.id) {
-                this.commandMusic.leave(guildId)
-                message.reply('Bye Bye!')
+                this.commandMusic.loop(guildId)
+                message.reply('Looping!')
             } else message.reply(`I'm not in the same voice channel as you`)
 
         } else {
             message.reply('You must be in a voice channel to use this command')
             return
         }
-
     }
-
 }

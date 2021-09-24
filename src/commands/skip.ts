@@ -8,24 +8,22 @@ export default class Skip implements Command {
     name: string = 'skip'
     description: string = 'Skip a song'
     options: Array<string> = []
-    commandMusic: CommandMusic
 
-    constructor(commandMusic: CommandMusic){
-        this.commandMusic = commandMusic
-    }
+    constructor(public commandMusic: CommandMusic){}
 
     execute(message: Message | CommandInteraction) {
         if (message.member instanceof GuildMember && message.member.voice.channel) {
             const guildId: string = message.member.guild.id
             let track: Track | undefined = this.commandMusic.queue.get(guildId)
-            if (!track) return;
-            if (!track.voiceConnection) {
-                message.reply('I\'m not in a voice channel')
+            if (!track) {
+                message.reply(`I'm not in a voice channel`)
                 return
             }
+            if (track.voiceConnection.joinConfig.channelId === message.member.voice.channel.id) {
+                this.commandMusic.skip(guildId)
+                message.reply('Skipped')
+            } else message.reply(`I'm not in the same voice channel as you`)
 
-            track.audioPlayer.stop()
-            message.reply('Skipped')
         }
     }
     

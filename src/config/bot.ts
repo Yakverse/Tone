@@ -4,7 +4,7 @@ import { typeSlashCommand } from "./typeSlashCommand.enum";
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 
-export class Bot {
+export default class Bot {
 
     client: Client = new Client({ 
         intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES],

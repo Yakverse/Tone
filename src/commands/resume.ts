@@ -8,12 +8,8 @@ export default class Pause implements Command {
     name: string = 'resume'
     description: string = 'Resume the song'
     options: Array<string> = []
-    
-    commandMusic: CommandMusic
 
-    constructor(commandMusic: CommandMusic){
-        this.commandMusic = commandMusic
-    }
+    constructor(public commandMusic: CommandMusic){}
 
     execute(message: Message | CommandInteraction) {
         if (message.member instanceof GuildMember && message.member.voice.channel) {

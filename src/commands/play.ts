@@ -1,8 +1,8 @@
-import {AudioPlayerStatus, joinVoiceChannel, VoiceConnection} from "@discordjs/voice";
+import { joinVoiceChannel, VoiceConnection } from "@discordjs/voice";
 import {CommandInteraction, GuildMember, Message, StageChannel, VoiceChannel} from "discord.js";
 import { Command } from "./command";
 import CommandMusic from "./music_utils/commandMusic";
-import {MoreVideoDetails, validateURL} from 'ytdl-core';
+import {getBasicInfo, validateURL, videoInfo} from 'ytdl-core';
 import Track from "./music_utils/track";
 
 export default class Play implements Command {
@@ -28,25 +28,21 @@ export default class Play implements Command {
         }
     }
 
-    private process(message: Message | CommandInteraction, channel: VoiceChannel | StageChannel, url: string | null): void{
+    private async process(message: Message | CommandInteraction, channel: VoiceChannel | StageChannel, url: string | null) {
         if (!url || !validateURL(url)) {
-            message.reply('Invalid URL')
+            await message.reply('Invalid URL')
             return
         }
         const track: Track | undefined = this.commandMusic.queue.get(channel.guildId)
-        let addedToQueue: boolean = false
         if (track) {
             let voiceConnection: VoiceConnection = track.voiceConnection
 
-            if (voiceConnection.joinConfig.channelId === channel.id) {
-                if (track.audioPlayer.state.status === AudioPlayerStatus.Playing) addedToQueue = true
-            } else {
-                message.reply(`Sorry, I'm in OTHER channel with OTHER friends now`)
+            if (voiceConnection.joinConfig.channelId != channel.id) {
+                await message.reply(`Sorry, I'm in OTHER channel with OTHER friends now`)
                 return;
             }
 
-        }
-        else {
+        } else {
             this.commandMusic.setVoiceConnection(
                 joinVoiceChannel({
                     channelId: channel.id,
@@ -57,10 +53,9 @@ export default class Play implements Command {
             )
         }
 
-        this.commandMusic.addQueue(channel.guildId, url).then((video: MoreVideoDetails) => {
-                if (addedToQueue) message.reply(`${video.title} Added to queue`)
-                else message.reply(`Playing ${video.title}`)
-        })
+        const info: videoInfo = await getBasicInfo(url)
+        await message.reply(`${info.videoDetails.title} Added to queue`)
+        await this.commandMusic.addQueue(channel.guildId, info)
     }
 
 }

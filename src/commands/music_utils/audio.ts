@@ -1,15 +1,15 @@
 import { AudioResource, createAudioResource, demuxProbe } from "@discordjs/voice";
 import { raw as ytdl } from 'youtube-dl-exec';
-// import {MoreVideoDetails} from "ytdl-core";
+import {videoInfo} from "ytdl-core";
 
 export default class Audio {
 
-    constructor(public url: string, public title: string) {}
+    constructor(public info: videoInfo) {}
 
     createAudio(): Promise<AudioResource<Audio>>{
         return new Promise((resolve, reject) => {
             const process = ytdl(
-                this.url,
+                this.info.videoDetails.video_url,
                 {
                     o: '-',
                     q: '',
