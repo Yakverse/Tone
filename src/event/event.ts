@@ -24,7 +24,7 @@ export class Event {
             contentSplit.shift()
             let args: Array<string> = contentSplit
 
-            try{ this.commandFactory.factory(command, message).execute(message, args) }
+            try{ this.commandFactory.factory(command).execute(message, args) }
             catch (e: unknown) {
                 if (e instanceof InvalidCommand) message.reply(e.message)
             }
@@ -34,7 +34,7 @@ export class Event {
     onInteraction(interaction: Interaction): void {
         if (!interaction.isCommand()) return
 
-        try { this.commandFactory.factory(interaction.commandName, interaction).execute(interaction, null) }
+        try { this.commandFactory.factory(interaction.commandName).execute(interaction, null) }
         catch (e) {
             if (e instanceof InvalidCommand) interaction.reply(e.message)
         }

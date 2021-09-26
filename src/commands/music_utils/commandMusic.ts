@@ -7,15 +7,18 @@ import { CommandInteraction, Message } from "discord.js";
 export default class CommandMusic {
 
     queue: Map<string, Track> = new Map<string, Track>();
-    message: Message | CommandInteraction | undefined
 
-    setVoiceConnection(voiceConnection: VoiceConnection, guildId: string){
+    setVoiceConnection(voiceConnection: VoiceConnection, guildId: string, message: Message | CommandInteraction){
 
         let track: Track | undefined = this.queue.get(guildId)
-        if (!track) track = this.queue.set(guildId, new Track(voiceConnection)).get(guildId)
+
+        if (!track)
+            track = this.queue.set(guildId, new Track(voiceConnection, message)).get(guildId)
+
         track!.audioPlayer.on('stateChange', (oldState, newState) => {
             if (newState.status === AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) this.processQueue(guildId)
         })
+
         track!.voiceConnection = voiceConnection
         track!.voiceConnection.subscribe(<AudioPlayer> track!.audioPlayer)
 
@@ -24,8 +27,11 @@ export default class CommandMusic {
     leave(guildId: string){
         const track: Track | undefined = this.queue.get(guildId)
         if (!track) return
+
         let voiceConnection: VoiceConnection | undefined = track.voiceConnection
-        if (voiceConnection) voiceConnection.destroy()
+        if (voiceConnection)
+            voiceConnection.destroy()
+
         track.clearAudios()
         this.queue.delete(guildId)
     }
@@ -33,12 +39,14 @@ export default class CommandMusic {
     stop(guildId: string){
         const track: Track | undefined = this.queue.get(guildId)
         if (!track) return
+
         track.clearAudios()
     }
 
     skip(guildId: string){
         const track: Track | undefined = this.queue.get(guildId)
         if (!track) return
+
         track.stop()
     }
 
@@ -46,6 +54,7 @@ export default class CommandMusic {
         let track: Track | undefined = this.queue.get(guildId)
         // TODO: RETURN
         if (!track) return
+
         track.audios.push(new Audio(videoInfo))
         await this.processQueue(guildId)
     }
@@ -61,6 +70,12 @@ export default class CommandMusic {
         const track: Track | undefined = this.queue.get(guildId)
         if (!track) return
         track.audios[0].timesToPlay = 0
+    }
+
+    setMessage(guildId: string, message: Message | CommandInteraction) {
+        const track: Track | undefined = this.queue.get(guildId)
+        if (track)
+            track.message = message
     }
 
     async processQueue(guildId: string){
@@ -85,7 +100,8 @@ export default class CommandMusic {
                 const audioResource: AudioResource<Audio> = await track.actualAudio.createAudio()
                 track.actualAudio.timesToPlay -= 1
                 track.audioPlayer.play(audioResource)
-                if (this.message) await this.message.reply(`Now playing ${audioResource.metadata.info.videoDetails.title}`)
+                if (track.message && track.message instanceof Message) await track.message.edit(`Now playing ${audioResource.metadata.info.videoDetails.title}`)
+                else if (track.message) await track.message.editReply(`Now playing ${audioResource.metadata.info.videoDetails.title}`)
             }
             catch (e) { console.log(e) }
         }
