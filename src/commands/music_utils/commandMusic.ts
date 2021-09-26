@@ -29,6 +29,7 @@ export default class CommandMusic {
         let voiceConnection: VoiceConnection | undefined = track.voiceConnection
         if (voiceConnection) voiceConnection.destroy()
         track.clearAudios()
+        this.queue.delete(guildId)
     }
 
     stop(guildId: string){
