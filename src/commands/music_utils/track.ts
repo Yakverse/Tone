@@ -6,11 +6,15 @@ export default class Track{
     audios: Array<Audio> = new Array<Audio>()
     audioPlayer: AudioPlayer = createAudioPlayer()
     actualAudio: Audio | undefined
+    indexActualAudio: number = 0
+    timesToPlay: number = 1
 
     constructor(public voiceConnection: VoiceConnection, public message: Message | CommandInteraction ) {}
 
     clearAudios(){
         this.audios = []
+        this.indexActualAudio = 0
+        this.timesToPlay = 1
         this.stop()
     }
 

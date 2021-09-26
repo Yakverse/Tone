@@ -63,14 +63,14 @@ export default class CommandMusic {
         const track: Track | undefined = this.queue.get(guildId)
         if (!track) return
         if (!track.actualAudio) return
-        track.actualAudio.timesToPlay = Number.MAX_SAFE_INTEGER
+        track.timesToPlay = Number.MAX_SAFE_INTEGER
     }
 
     unloop(guildId: string){
         const track: Track | undefined = this.queue.get(guildId)
         if (!track) return
         if (!track.actualAudio) return
-        track.actualAudio.timesToPlay = 0
+        track.timesToPlay = 0
     }
 
     setMessage(guildId: string, message: Message | CommandInteraction) {
@@ -83,30 +83,27 @@ export default class CommandMusic {
         const track: Track | undefined = this.queue.get(guildId)
         if (track) {
             if (track.audioPlayer.state.status !== AudioPlayerStatus.Idle) return
-            if (track.audios.length === 0){
-                if (track.actualAudio){
-                    if (track.actualAudio.timesToPlay <= 0){
-                        return
-                    }
-                } else return
-            } else {
-                if (track.actualAudio){
-                    if (track.actualAudio!.timesToPlay <= 0) {
-                        track.actualAudio = track.audios.shift()!
-                    }
-                } else track.actualAudio = track.audios.shift()!
-            }
+            
+            if (track.audios.length === track.indexActualAudio + 1){
+                if (track.timesToPlay > 0){
+                    track.timesToPlay--
+                    track.indexActualAudio = 0
+                }
+                else if (track.timesToPlay === 0) {
+                    track.clearAudios()
+                    return
+                }
+            } else track.indexActualAudio++
 
             try {
+                track.actualAudio = track.audios[track.indexActualAudio]
                 const audioResource: AudioResource<Audio> = await track.actualAudio.createAudio()
-                track.actualAudio.timesToPlay -= 1
                 track.audioPlayer.play(audioResource)
                 if (track.message && track.message instanceof Message) await track.message.edit(`Now playing ${audioResource.metadata.info.videoDetails.title}`)
                 else if (track.message) await track.message.editReply(`Now playing ${audioResource.metadata.info.videoDetails.title}`)
             }
             catch (e) { console.log(e) }
         }
-
     }
 
 }

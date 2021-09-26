@@ -35,15 +35,15 @@ export default class Play implements Command {
             await message.reply('Invalid URL')
             return
         }
+
+        if (!(message instanceof CommandInteraction))
+            message = await message.reply(`Searching ${url[0]}`)
+        else await message.reply(`Searching ${url[0]}`)
         
         if (!validateURL(url[0])) {
             if (url instanceof Array)
                 url = [url.join(' ')]
             else url = [url]
-
-            if (!(message instanceof CommandInteraction))
-                message = await message.reply(`Searching ${url[0]}`)
-            else await message.reply(`Searching ${url[0]}`)
 
             url = [
                 (await axios.get(`${environment.ytdSearchURL}${url[0].replace(' ', '%20')}`))
