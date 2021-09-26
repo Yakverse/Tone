@@ -1,10 +1,8 @@
-import {AudioPlayer, AudioPlayerStatus, AudioResource, VoiceConnection} from "@discordjs/voice";
-import {videoInfo} from 'ytdl-core';
+import { AudioPlayer, AudioPlayerStatus, AudioResource, VoiceConnection } from "@discordjs/voice";
+import { videoInfo } from 'ytdl-core';
 import Audio from "./audio";
 import Track from "./track";
-import {Mode} from "./trackEnum";
-import {CommandInteraction, Message} from "discord.js";
-
+import { CommandInteraction, Message } from "discord.js";
 
 export default class CommandMusic {
 
@@ -55,22 +53,37 @@ export default class CommandMusic {
     loop(guildId: string){
         const track: Track | undefined = this.queue.get(guildId)
         if (!track) return
-        track.mode = Mode.LOOP
+        if (!track.actualAudio) return
+        track.actualAudio.timesToPlay = Number.MAX_SAFE_INTEGER
     }
 
     unloop(guildId: string){
         const track: Track | undefined = this.queue.get(guildId)
         if (!track) return
-        track.mode = Mode.NORMAL
+        track.audios[0].timesToPlay = 0
     }
 
     async processQueue(guildId: string){
         const track: Track | undefined = this.queue.get(guildId)
         if (track) {
-            if (track.audioPlayer.state.status !== AudioPlayerStatus.Idle || (track.audios.length === 0 && track.mode == Mode.NORMAL)) return
-            if (track.mode == Mode.NORMAL || !track.actualAudio) track.actualAudio = track.audios.shift()!
+            if (track.audioPlayer.state.status !== AudioPlayerStatus.Idle) return
+            if (track.audios.length === 0){
+                if (track.actualAudio){
+                    if (track.actualAudio.timesToPlay <= 0){
+                        return
+                    }
+                } else return
+            } else {
+                if (track.actualAudio){
+                    if (track.actualAudio!.timesToPlay <= 0) {
+                        track.actualAudio = track.audios.shift()!
+                    }
+                } else track.actualAudio = track.audios.shift()!
+            }
+
             try {
                 const audioResource: AudioResource<Audio> = await track.actualAudio.createAudio()
+                track.actualAudio.timesToPlay -= 1
                 track.audioPlayer.play(audioResource)
                 if (this.message) await this.message.reply(`Now playing ${audioResource.metadata.info.videoDetails.title}`)
             }

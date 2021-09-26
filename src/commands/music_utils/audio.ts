@@ -4,6 +4,8 @@ import {videoInfo} from "ytdl-core";
 
 export default class Audio {
 
+    timesToPlay: number = 1
+
     constructor(public info: videoInfo) {}
 
     createAudio(): Promise<AudioResource<Audio>>{
