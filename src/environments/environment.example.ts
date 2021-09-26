@@ -1,4 +1,5 @@
 export const environment = {
     token: '',
-    prefix: ''
+    prefix: '',
+    ytdSearchURL: ''
 }
