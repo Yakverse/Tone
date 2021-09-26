@@ -2,7 +2,6 @@ import * as commands from '../commands'
 import { InvalidCommand } from '../errors/invalidCommand';
 import { Command } from './command';
 import CommandMusic from './music_utils/commandMusic';
-import {CommandInteraction, Message} from "discord.js";
 
 export class CommandFactory {
 
@@ -12,8 +11,7 @@ export class CommandFactory {
         this.commandMusic = new CommandMusic()
     }
 
-    factory(command: string, message: Message | CommandInteraction): Command {
-        this.commandMusic.message = message
+    factory(command: string): Command {
         switch (command) {
             case 'ping':
                 return new commands.Ping()

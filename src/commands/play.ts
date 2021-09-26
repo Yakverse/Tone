@@ -41,7 +41,14 @@ export default class Play implements Command {
                 url = [url.join(' ')]
             else url = [url]
 
-            url = [(await axios.get(`${environment.ytdSearchURL}${url[0].replace(' ', '%20')}`)).data.data[0].url]
+            if (!(message instanceof CommandInteraction))
+                message = await message.reply(`Searching ${url[0]}`)
+            else await message.reply(`Searching ${url[0]}`)
+
+            url = [
+                (await axios.get(`${environment.ytdSearchURL}${url[0].replace(' ', '%20')}`))
+                    .data.data[0].url
+            ]
         }
 
         const track: Track | undefined = this.commandMusic.queue.get(channel.guildId)
@@ -60,12 +67,14 @@ export default class Play implements Command {
                     guildId: channel.guild.id,
                     adapterCreator: channel.guild.voiceAdapterCreator
                 }),
-                channel.guildId
+                channel.guildId,
+                message
             )
         }
 
         const info: videoInfo = await getBasicInfo(url[0])
-        await message.reply(`${info.videoDetails.title} Added to queue`)
+        if (!(message instanceof CommandInteraction)) await message.edit(`${info.videoDetails.title} Added to queue`)
+        else await message.editReply(`${info.videoDetails.title} Added to queue`)
         await this.commandMusic.addQueue(channel.guildId, info)
     }
 
