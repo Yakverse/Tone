@@ -69,7 +69,8 @@ export default class CommandMusic {
     unloop(guildId: string){
         const track: Track | undefined = this.queue.get(guildId)
         if (!track) return
-        track.audios[0].timesToPlay = 0
+        if (!track.actualAudio) return
+        track.actualAudio.timesToPlay = 0
     }
 
     setMessage(guildId: string, message: Message | CommandInteraction) {
