@@ -7,3 +7,4 @@ export { default as Resume } from './resume';
 export { default as Stop } from './stop';
 export { default as Loop } from './loop';
 export { default as Unloop } from './unloop';
+export { default as Help } from './help';
