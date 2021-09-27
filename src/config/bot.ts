@@ -82,7 +82,15 @@ export default class Bot {
                         },
                         {
                             name: 'loop',
-                            description: 'loop the song'
+                            description: 'loop the song',
+                            options: [
+                                {
+                                    name: 'number',
+                                    type: typeSlashCommand.INTEGER,
+                                    description: 'Number of times the queue will repeat',
+                                    required: false
+                                }
+                            ]
                         },
                         {
                             name: 'unloop',

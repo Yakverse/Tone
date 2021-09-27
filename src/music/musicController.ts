@@ -45,11 +45,11 @@ export default class MusicController {
         await queue.processQueue()
     }
 
-    loop(guildId: string){
+    loop(guildId: string, number: number | undefined){
         const queue: Queue | undefined = this.guilds.get(guildId)
         if (!queue) return
         if (!queue.actualAudio) return
-        queue.loop()
+        queue.loop(number)
     }
 
     unloop(guildId: string){

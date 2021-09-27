@@ -36,8 +36,9 @@ export default class Queue {
         this.clearAudios()
     }
 
-    loop(){
-        this.timesToPlay = Number.MAX_SAFE_INTEGER
+    loop(number: number | undefined){
+        if (number) this.timesToPlay = number - 1
+        else this.timesToPlay = Number.MAX_SAFE_INTEGER
     }
 
     unloop(){
