@@ -97,7 +97,7 @@ export default class Bot {
             
             const rest = new REST({ version: '9' }).setToken(this.token);
             await rest.put(
-                Routes.applicationGuildCommands(this.client.user.id, '534774137902596106'),
+                Routes.applicationCommands(this.client.user.id),
                 Bot.slashCommands
             ); 
         })();
