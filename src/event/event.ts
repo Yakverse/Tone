@@ -27,6 +27,7 @@ export class Event {
             try{ this.commandFactory.factory(command).execute(message, args) }
             catch (e: unknown) {
                 if (e instanceof InvalidCommand) message.reply(e.message)
+                else message.reply("Something get wrong")
             }
         }
     }
@@ -37,6 +38,7 @@ export class Event {
         try { this.commandFactory.factory(interaction.commandName).execute(interaction, null) }
         catch (e) {
             if (e instanceof InvalidCommand) interaction.reply(e.message)
+            else interaction.reply("Something get wrong")
         }
     }
 

@@ -1,9 +1,9 @@
 import { joinVoiceChannel, VoiceConnection } from "@discordjs/voice";
 import {CommandInteraction, GuildMember, Message, StageChannel, VoiceChannel} from "discord.js";
 import { Command } from "./command";
-import CommandMusic from "./music_utils/commandMusic";
+import MusicController from "../music/musicController";
 import {getBasicInfo, validateURL, videoInfo} from 'ytdl-core';
-import Track from "./music_utils/track";
+import Queue from "../music/queue";
 import axios from "axios";
 import { environment } from "../environments/environment";
 
@@ -13,7 +13,7 @@ export default class Play implements Command {
     description: string = 'Play a song'
     options: Array<string> = []
 
-    constructor(public commandMusic: CommandMusic){}
+    constructor(public commandMusic: MusicController){}
 
     execute(message: Message | CommandInteraction, args: Array<string>) {
         if (message.member instanceof GuildMember && message.member.voice.channel) {
@@ -51,7 +51,7 @@ export default class Play implements Command {
             ]
         }
 
-        const track: Track | undefined = this.commandMusic.queue.get(channel.guildId)
+        const track: Queue | undefined = this.commandMusic.guilds.get(channel.guildId)
         if (track) {
             let voiceConnection: VoiceConnection = track.voiceConnection
 
@@ -61,7 +61,7 @@ export default class Play implements Command {
             }
 
         } else {
-            this.commandMusic.setVoiceConnection(
+            this.commandMusic.configGuildQueue(
                 joinVoiceChannel({
                     channelId: channel.id,
                     guildId: channel.guild.id,

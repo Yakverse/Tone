@@ -1,7 +1,7 @@
 import {Command} from "./command";
-import CommandMusic from "./music_utils/commandMusic";
+import MusicController from "../music/musicController";
 import {CommandInteraction, GuildMember, Message} from "discord.js";
-import Track from "./music_utils/track";
+import Queue from "../music/queue";
 import {VoiceConnection} from "@discordjs/voice";
 
 export default class UnLoop implements Command {
@@ -10,12 +10,12 @@ export default class UnLoop implements Command {
     description: string = 'unloop the song'
     options: Array<string> = []
 
-    constructor(public commandMusic: CommandMusic){}
+    constructor(public commandMusic: MusicController){}
 
     execute(message: Message | CommandInteraction) {
         if (message.member instanceof GuildMember && message.member.voice.channel) {
             const guildId: string = message.member.guild.id
-            let track: Track | undefined = this.commandMusic.queue.get(guildId)
+            let track: Queue | undefined = this.commandMusic.guilds.get(guildId)
             if (!track) {
                 message.reply(`I'm not in a voice channel`)
                 return;

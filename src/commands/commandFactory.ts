@@ -1,14 +1,14 @@
 import * as commands from '../commands'
 import { InvalidCommand } from '../errors/invalidCommand';
 import { Command } from './command';
-import CommandMusic from './music_utils/commandMusic';
+import MusicController from '../music/musicController';
 
 export class CommandFactory {
 
-    commandMusic: CommandMusic
+    commandMusic: MusicController
 
     constructor(){
-        this.commandMusic = new CommandMusic()
+        this.commandMusic = new MusicController()
     }
 
     factory(command: string): Command {
