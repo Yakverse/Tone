@@ -24,6 +24,8 @@ export class CommandFactory {
                 return new commands.Loop()
             case 'unloop':
                 return new commands.Unloop()
+            case 'help':
+                return new commands.Help()
             default:
                 throw new InvalidCommand();
         }

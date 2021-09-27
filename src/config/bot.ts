@@ -1,6 +1,6 @@
 import { Client, Intents } from "discord.js";
 import { Event } from "../event/event";
-import { typeSlashCommand } from "./typeSlashCommand.enum";
+import {typeSlashCommand} from "./typeSlashCommand.enum";
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 
@@ -19,6 +19,58 @@ export default class Bot {
         }
     });
     event: Event = new Event(this.client)
+    static slashCommands = {
+        body: [
+            {
+                name: "ping",
+                description: "ping, pong"
+            },
+            {
+                name: 'play',
+                description: 'Play a song',
+                options: [
+                    {
+                        name: 'song',
+                        type: typeSlashCommand.STRING,
+                        description: 'URL or name of the song',
+                        required: true
+                    }
+                ]
+            },
+            {
+                name: 'leave',
+                description: 'Leave the voice channel'
+            },
+            {
+                name: 'skip',
+                description: 'Skip the song'
+            },
+            {
+                name: 'pause',
+                description: 'Pause the song'
+            },
+            {
+                name: 'resume',
+                description: 'Resume the song'
+            },
+            {
+                name: 'stop',
+                description: 'Stop the song and clear queue'
+            },
+            {
+                name: 'loop',
+                description: 'loop the song'
+            },
+            {
+                name: 'unloop',
+                description: 'unloop the song'
+            },
+            {
+                name: 'help',
+                description: 'need some help? wanna know the commands?'
+            }
+        ]
+    }
 
     constructor(private token: string | undefined){
         if (!token) throw new Error("Invalid token");
@@ -31,10 +83,6 @@ export default class Bot {
         })
     }
     
-    get getClient(): Client { return this.client; }
-    
-    get getToken(): string | undefined { return this.token; }
-    
     private addSlashCommands(): void{
         (async () => {
             if (!this.client.user) throw new Error('User error')
@@ -42,55 +90,10 @@ export default class Bot {
             const rest = new REST({ version: '9' }).setToken(this.token);
             await rest.put(
                 Routes.applicationGuildCommands(this.client.user.id, '534774137902596106'),
-                {
-                    body: [
-                        {
-                            name: "ping",
-                            description: "teste"
-                        },
-                        {
-                            name: 'play',
-                            description: 'Play a song',
-                            options: [
-                                {
-                                    name: 'song',
-                                    type: typeSlashCommand.STRING,
-                                    description: 'URL or name of the song',
-                                    required: true
-                                }
-                            ]
-                        },
-                        {
-                            name: 'leave',
-                            description: 'Leave the voice channel'
-                        },
-                        {
-                            name: 'skip',
-                            description: 'Skip the song'
-                        },
-                        {
-                            name: 'pause',
-                            description: 'Pause the song'
-                        },
-                        {
-                            name: 'resume',
-                            description: 'Resume the song'
-                        },
-                        {
-                            name: 'stop',
-                            description: 'Stop the song and clear queue'
-                        },
-                        {
-                            name: 'loop',
-                            description: 'loop the song'
-                        },
-                        {
-                            name: 'unloop',
-                            description: 'unloop the song'
-                        }
-                    ]
-                }
+                Bot.slashCommands
             ); 
         })();
     }
+
+
 }
