@@ -79,6 +79,14 @@ export default class Bot {
                         {
                             name: 'stop',
                             description: 'Stop the song and clear queue'
+                        },
+                        {
+                            name: 'loop',
+                            description: 'loop the song'
+                        },
+                        {
+                            name: 'unloop',
+                            description: 'unloop the song'
                         }
                     ]
                 }
