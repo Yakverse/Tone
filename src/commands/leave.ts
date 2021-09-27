@@ -1,16 +1,14 @@
 import {CommandInteraction, GuildMember, Message} from "discord.js";
 import { Command } from "./command";
-import MusicController from "../music/musicController";
 import {VoiceConnection} from "@discordjs/voice";
 import Queue from "../music/queue";
+import MusicCommand from "./musicCommand";
 
-export default class Leave implements Command {
+export default class Leave extends MusicCommand implements Command {
     
     name: string = 'leave'
     description: string = 'Leave the voice channel'
     options: Array<string> = []
-    
-    constructor(public musicController: MusicController){}
 
     execute(message: Message | CommandInteraction) {
         if (message.member instanceof GuildMember && message.member.voice.channel) {

@@ -1,36 +1,29 @@
 import * as commands from '../commands'
 import { InvalidCommand } from '../errors/invalidCommand';
 import { Command } from './command';
-import MusicController from '../music/musicController';
 
 export class CommandFactory {
-
-    commandMusic: MusicController
-
-    constructor(){
-        this.commandMusic = new MusicController()
-    }
 
     factory(command: string): Command {
         switch (command) {
             case 'ping':
                 return new commands.Ping()
             case 'play':
-                return new commands.Play(this.commandMusic)
+                return new commands.Play()
             case 'leave':
-                return new commands.Leave(this.commandMusic)
+                return new commands.Leave()
             case 'skip':
-                return new commands.Skip(this.commandMusic)
+                return new commands.Skip()
             case 'pause':
-                return new commands.Pause(this.commandMusic)
+                return new commands.Pause()
             case 'resume':
-                return new commands.Resume(this.commandMusic)
+                return new commands.Resume()
             case 'stop':
-                return new commands.Stop(this.commandMusic)
+                return new commands.Stop()
             case 'loop':
-                return new commands.Loop(this.commandMusic)
+                return new commands.Loop()
             case 'unloop':
-                return new commands.UnLoop(this.commandMusic)
+                return new commands.Unloop()
             default:
                 throw new InvalidCommand();
         }

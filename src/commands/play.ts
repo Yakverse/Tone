@@ -1,19 +1,17 @@
 import { joinVoiceChannel, VoiceConnection } from "@discordjs/voice";
 import {CommandInteraction, GuildMember, Message, StageChannel, VoiceChannel} from "discord.js";
 import { Command } from "./command";
-import MusicController from "../music/musicController";
 import {getBasicInfo, validateURL, videoInfo} from 'ytdl-core';
 import Queue from "../music/queue";
 import axios from "axios";
 import { environment } from "../environments/environment";
+import MusicCommand from "./musicCommand";
 
-export default class Play implements Command {
+export default class Play extends MusicCommand implements Command {
 
     name: string = 'play'
     description: string = 'Play a song'
     options: Array<string> = []
-
-    constructor(public commandMusic: MusicController){}
 
     execute(message: Message | CommandInteraction, args: Array<string>) {
         if (message.member instanceof GuildMember && message.member.voice.channel) {
@@ -51,7 +49,7 @@ export default class Play implements Command {
             ]
         }
 
-        const track: Queue | undefined = this.commandMusic.guilds.get(channel.guildId)
+        const track: Queue | undefined = this.musicController.guilds.get(channel.guildId)
         if (track) {
             let voiceConnection: VoiceConnection = track.voiceConnection
 
@@ -61,7 +59,7 @@ export default class Play implements Command {
             }
 
         } else {
-            this.commandMusic.configGuildQueue(
+            this.musicController.configGuildQueue(
                 joinVoiceChannel({
                     channelId: channel.id,
                     guildId: channel.guild.id,
@@ -75,7 +73,7 @@ export default class Play implements Command {
         const info: videoInfo = await getBasicInfo(url[0])
         if (!(message instanceof CommandInteraction)) await message.edit(`${info.videoDetails.title} Added to queue`)
         else await message.editReply(`${info.videoDetails.title} Added to queue`)
-        await this.commandMusic.addQueue(channel.guildId, info)
+        await this.musicController.addQueue(channel.guildId, info)
     }
 
 }
