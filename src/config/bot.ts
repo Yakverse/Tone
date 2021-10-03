@@ -1,6 +1,6 @@
 import { Client, Intents } from "discord.js";
 import { Event } from "../event/event";
-import {typeSlashCommand} from "./typeSlashCommand.enum";
+import {typeSlashCommand} from "../enumerations/typeSlashCommand.enum";
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 

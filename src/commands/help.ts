@@ -1,6 +1,8 @@
 import {CommandInteraction, Message} from "discord.js";
 import {environment} from "../environments/environment";
 import Bot from "../config/bot";
+import {Embeds} from "../embeds/embed";
+import {ColorsEnum} from "../enumerations/Colors.enum";
 
 export default class Help{
 
@@ -14,7 +16,12 @@ export default class Help{
             const command: any = Bot.slashCommands.body[i]
             fields += `${command.name} | ${command.description}\n`
         }
-        message.reply(`Commands\nprefix: ${environment.prefix}\n\n${fields}`)
+
+        let embed = new Embeds({
+            hexColor: ColorsEnum.GRAY,
+            description: `Commands\nprefix: ${environment.prefix}\n\n${fields}`,
+        })
+        message.reply({embeds:[embed.build()]})
     }
 
 }
