@@ -1,4 +1,4 @@
-import { joinVoiceChannel, VoiceConnection } from "@discordjs/voice";
+import { joinVoiceChannel} from "@discordjs/voice";
 import {CommandInteraction, GuildMember, Message, StageChannel, VoiceChannel} from "discord.js";
 import { Command } from "./command";
 import {getBasicInfo, validateURL, videoInfo} from 'ytdl-core';
@@ -72,9 +72,7 @@ export default class Play extends MusicCommand implements Command {
 
         const track: Queue | undefined = this.musicController.guilds.get(channel.guildId)
         if (track) {
-            let voiceConnection: VoiceConnection = track.voiceConnection
-
-            if (voiceConnection.joinConfig.channelId != channel.id) {
+            if (track.voiceConnection.joinConfig.channelId != channel.id) {
                 let embed = new Embeds({
                     hexColor: ColorsEnum.RED,
                     description: `Sorry, I'm in OTHER channel with OTHER friends now`,
@@ -104,9 +102,12 @@ export default class Play extends MusicCommand implements Command {
 
         if (!(message instanceof CommandInteraction)){
             await message.edit({embeds:[embed.build()]})
+            await this.musicController.addQueue(channel.guildId, info, message)
         }
-        else await message.editReply({embeds:[embed.build()]})
-        await this.musicController.addQueue(channel.guildId, info)
+        else{
+            await message.editReply({embeds:[embed.build()]})
+            await this.musicController.addQueue(channel.guildId, info, null)
+        }
     }
 
 }

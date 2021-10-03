@@ -26,6 +26,8 @@ export class CommandFactory {
                 return new commands.Unloop()
             case 'help':
                 return new commands.Help()
+            case 'queue':
+                return new commands.Queue()
             default:
                 throw new InvalidCommand();
         }

@@ -37,12 +37,15 @@ export default class MusicController {
         queue.skip()
     }
 
-    async addQueue(guildId: string, videoInfo: videoInfo): Promise<videoInfo | undefined>{
-        let queue: Queue | undefined = this.guilds.get(guildId)
-        if (!queue) return
+    async addQueue(guildId: string, videoInfo: videoInfo, message: Message | null): Promise<videoInfo | undefined>{
+        let queue: Queue | undefined = this.guilds.get(guildId);
+        if (!queue) return;
 
-        queue.addAudio(new Audio(videoInfo))
-        await queue.processQueue()
+        if (message)
+            queue.updateMessage(message);
+
+        queue.addAudio(new Audio(videoInfo));
+        await queue.processQueue();
     }
 
     loop(guildId: string, number: number | undefined){

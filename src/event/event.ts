@@ -16,18 +16,17 @@ export class Event {
         if (message.author.bot) return
 
         if (message.content.startsWith(environment.prefix)){
-            let contentSplit: Array<string> = message.content.split(" ")
+            let args: Array<string> = message.content.split(" ")
 
-            let command: string = contentSplit[0].split(environment.prefix)[1]
+            let command: string = args[0].split(environment.prefix)[1]
             if (!command) return
 
-            contentSplit.shift()
-            let args: Array<string> = contentSplit
+            args.shift()
 
             try{ this.commandFactory.factory(command).execute(message, args) }
             catch (e: unknown) {
                 if (e instanceof InvalidCommand) message.reply(e.message)
-                else message.reply("Something get wrong")
+                else message.reply("Something went wrong")
             }
         }
     }
@@ -38,7 +37,7 @@ export class Event {
         try { this.commandFactory.factory(interaction.commandName).execute(interaction, null) }
         catch (e) {
             if (e instanceof InvalidCommand) interaction.reply(e.message)
-            else interaction.reply("Something get wrong")
+            else interaction.reply("Something went wrong")
         }
     }
 

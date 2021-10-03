@@ -5,12 +5,14 @@ import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 
 export default class Queue {
+    // Nome - Duração
+    audiosInfo: Array<[string,string]> = new Array<[string, string]>();
 
-    audios: Array<Audio> = new Array<Audio>()
-    audioPlayer: AudioPlayer = createAudioPlayer()
-    actualAudio: Audio | undefined
-    indexActualAudio: number = 0
-    timesToPlay: number = 1
+    audios: Array<Audio> = new Array<Audio>();
+    audioPlayer: AudioPlayer = createAudioPlayer();
+    actualAudio: Audio | undefined;
+    indexActualAudio: number = 0;
+    timesToPlay: number = 1;
 
     constructor(public voiceConnection: VoiceConnection, public message: Message | CommandInteraction ) {}
 
@@ -23,11 +25,21 @@ export default class Queue {
     }
 
     addAudio(audio: Audio){
-        this.audios.push(audio)
+
+        let time = new Date(parseInt(audio.info.videoDetails.lengthSeconds) * 1000).toISOString().substr(14, 5);
+        let title = audio.info.videoDetails.title;
+
+        this.audiosInfo.push([title, time]);
+        this.audios.push(audio);
+    }
+
+    updateMessage(message: Message){
+        this.message = message;
     }
 
     private clearAudios(){
         this.audios = []
+        this.audiosInfo = [];
         this.indexActualAudio = 0
         this.timesToPlay = 1
         this.audioPlayer.stop()
