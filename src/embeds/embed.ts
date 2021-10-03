@@ -17,25 +17,12 @@ export class Embeds{
     constructor(
         public options: EmbedInterface
     ) {
-        if (!options.description){
-            options.description = ''
-        }
+        if (!options.title) options.title = undefined
+        if (!options.description) options.description = undefined
+        if (!options.user) options.user = undefined
+        if (!options.hexColor) options.hexColor = undefined
+
     }
-
-
-    // constructor(
-    //     public title?: string,
-    //     public HexColor?: HexColorString,
-    //     public user?: User,
-    //     fields?: Array<Field> | Field
-    // ){
-    //     if (fields) this.fields = Array.isArray(fields) ? fields : [fields];
-    // };
-
-    setDescription(text: string){
-        this.options.description = text;
-    }
-
 
     addField(field: Field){
         this.fields.push(field);
