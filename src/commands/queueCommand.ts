@@ -32,7 +32,7 @@ export default class QueueCommand extends MusicCommand implements Command {
                     text += `${(currindex+i+1).toString()}. ${Utils.formatString(musInfo[0])} - ${Utils.parseSecondsToISO(musInfo[1])}\n`;
                 }
 
-                text += `\n ${musicQueue.length} song${musicQueue.length != 1 ? "s" : ""} in queue | ${Utils.parseSecondsToISO(totalLenght)} total length | Loop: ${looping == 1 ? "❌" : "✔"} `;
+                text += `\n ${musicQueue.length} song${musicQueue.length != 1 ? "s" : ""} in queue | ${Utils.parseSecondsToISO(totalLenght)} total length | Loop: ${looping <= 1 ? "❌" : "✔"} `;
 
                 text += "```";
                 message.reply({content:text});
