@@ -10,4 +10,22 @@ export default class Utils{
         }
         return text.padEnd(STRING_SIZE," ");
     }
+
+    static parseSecondsToISO(seconds: number){
+        if (seconds < 3600)
+            return new Date(seconds * 1000).toISOString().substr(14, 5);
+        return new Date(seconds * 1000).toISOString().substr(11, 8)
+    }
+
+    static parseISOToSeconds(ISO : string){
+        let ISOArr = ISO.split(":");
+        let multi = 1;
+        let total = 0;
+        for (const isoArrKey in ISOArr) {
+            total += parseInt(isoArrKey)*multi;
+            multi *= 60;
+        }
+        return total;
+    }
+
 }

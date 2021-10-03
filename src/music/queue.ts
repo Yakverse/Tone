@@ -6,7 +6,7 @@ import {ColorsEnum} from "../enumerations/Colors.enum";
 
 export default class Queue {
     // Nome - Duração
-    audiosInfo: Array<[string,string]> = new Array<[string, string]>();
+    audiosInfo: Array<[string, number]> = new Array<[string, number]>();
 
     audios: Array<Audio> = new Array<Audio>();
     audioPlayer: AudioPlayer = createAudioPlayer();
@@ -26,7 +26,7 @@ export default class Queue {
 
     addAudio(audio: Audio){
 
-        let time = new Date(parseInt(audio.info.videoDetails.lengthSeconds) * 1000).toISOString().substr(14, 5);
+        let time = parseInt(audio.info.videoDetails.lengthSeconds);
         let title = audio.info.videoDetails.title;
 
         this.audiosInfo.push([title, time]);
