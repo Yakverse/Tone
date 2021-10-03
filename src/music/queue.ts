@@ -1,6 +1,8 @@
 import Audio from "./audio";
 import {AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, VoiceConnection} from "@discordjs/voice";
 import { CommandInteraction, Message } from "discord.js";
+import {Embeds} from "../embeds/embed";
+import {ColorsEnum} from "../enumerations/Colors.enum";
 
 export default class Queue {
 
@@ -73,8 +75,14 @@ export default class Queue {
             this.actualAudio = this.audios[this.indexActualAudio]
             const audioResource: AudioResource<Audio> = await this.actualAudio.createAudio()
             this.audioPlayer.play(audioResource)
-            if (this.message && this.message instanceof Message) await this.message.edit(`Now playing ${audioResource.metadata.info.videoDetails.title}`)
-            else if (this.message) await this.message.editReply(`Now playing ${audioResource.metadata.info.videoDetails.title}`)
+
+            let embed = new Embeds({
+                hexColor: ColorsEnum.GREEN,
+                description: `Now playing ${audioResource.metadata.info.videoDetails.title}`,
+            })
+
+            if (this.message && this.message instanceof Message) await this.message.edit({ embeds: [embed.build()] })
+            else if (this.message) await this.message.editReply({ embeds: [embed.build()] })
         }
         catch (e) { console.log(e) }
     }

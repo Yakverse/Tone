@@ -1,5 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command } from "./command";
+import {Embeds} from "../embeds/embed";
+import {ColorsEnum} from "../enumerations/Colors.enum";
 
 export default class Ping implements Command {
 
@@ -8,9 +10,14 @@ export default class Ping implements Command {
     options: Array<string> = []
 
     execute(message: Message | CommandInteraction): void{
+        let embed = new Embeds({
+            hexColor: ColorsEnum.GRAY,
+            description: '**🏓  Pong!  🏓**'
+        })
+
         if (message instanceof Message)
-            message.channel.send('Pong!')
+            message.channel.send({embeds:[embed.build()]})
         else 
-            message.reply('Pong!')
+            message.reply({embeds:[embed.build()]})
     }
 }
