@@ -76,7 +76,11 @@ export default class Bot {
             {
                 name: 'help',
                 description: 'need some help? wanna know the commands?'
-            }
+            },
+            {
+                name: 'queue',
+                description: 'show the current server queue',
+            },
         ]
     }
 

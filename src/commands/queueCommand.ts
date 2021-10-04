@@ -26,6 +26,7 @@ export default class QueueCommand extends MusicCommand implements Command {
                 let totalLenght = 0;
 
                 let iterator = missingMusics > 10 ? 10 : missingMusics;
+                // TODO add loop support
                 for (let i = 0; i < iterator; i++) {
                     let musInfo = musicQueue[currindex+i];
                     totalLenght += musInfo[1];

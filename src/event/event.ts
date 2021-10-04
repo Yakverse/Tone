@@ -1,7 +1,8 @@
 import {Client, CommandInteraction, Interaction, Message} from "discord.js";
 import { CommandFactory } from "../commands/commandFactory";
 import { environment } from "../environments/environment";
-import { InvalidCommand } from "../errors/invalidCommand";
+import BotError from "../errors/botError";
+import {ErrorEmbed} from "../embeds/errorEmbed";
 
 export class Event {
 
@@ -40,8 +41,9 @@ export class Event {
     }
 
     private handlerException(message: CommandInteraction | Message, exception: unknown): void {
-        if (exception instanceof InvalidCommand) message.reply(exception.message)
-        else message.reply("Something went wrong")
+        if (exception instanceof BotError)
+            message.reply({embeds:[new ErrorEmbed(exception.message).build()]});
+        else message.reply({embeds:[new ErrorEmbed("Something went wrong").build()]})
     }
 
 

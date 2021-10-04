@@ -1,5 +1,5 @@
 import * as commands from '../commands'
-import { InvalidCommand } from '../errors/invalidCommand';
+import InvalidCommand from '../errors/invalidCommand';
 import { Command } from './command';
 
 export class CommandFactory {

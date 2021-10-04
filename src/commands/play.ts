@@ -93,21 +93,27 @@ export default class Play extends MusicCommand implements Command {
             )
         }
 
-        const info: videoInfo = await getBasicInfo(url[0])
 
-        let embed = new Embeds({
-            hexColor: ColorsEnum.GRAY,
-            description: `${info.videoDetails.title} Added to queue`,
-        })
+        // TODO fix bug where bot cant parse a video that is age restricted this try catch was made so the bot doesnt crash
+        let info: videoInfo | string = "Teste";
+        try {
+            info = await getBasicInfo(url[0])
+            let embed = new Embeds({
+                hexColor: ColorsEnum.GRAY,
+                description: `${info.videoDetails.title} Added to queue`,
+            })
 
-        if (!(message instanceof CommandInteraction)){
-            await message.edit({embeds:[embed.build()]})
-            await this.musicController.addQueue(channel.guildId, info, message)
-        }
-        else{
-            await message.editReply({embeds:[embed.build()]})
-            await this.musicController.addQueue(channel.guildId, info, null)
+            if (!(message instanceof CommandInteraction)){
+                await message.edit({embeds:[embed.build()]})
+                await this.musicController.addQueue(channel.guildId, info, message)
+            }
+            else{
+                await message.editReply({embeds:[embed.build()]})
+                await this.musicController.addQueue(channel.guildId, info, null)
+            }
+        } catch {
+            console.log(info);
+            await message.reply("Something went very wrong")
         }
     }
-
 }
