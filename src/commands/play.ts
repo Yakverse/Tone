@@ -38,16 +38,19 @@ export default class Play extends MusicCommand implements Command {
         if (url.length === 0){
             let embed = new Embeds({
                 hexColor: ColorsEnum.RED,
-                description: '**Invalid URL**',
+                description: '**Invalid music**',
             });
             await message.reply({embeds: [embed.build()]})
             return
         }
 
+        if (url instanceof Array) url = [url.join(' ')]
+        else url = [url]
+
         if (!(message instanceof CommandInteraction)){
             let embed = new Embeds({
                 hexColor: ColorsEnum.YELLOW,
-                description: `**🎵 Searching 🔎 ${url.concat(" ")}**`,
+                description: `**🎵 Searching 🔎 ${url[0]}**`,
             });
             message = await message.reply({embeds: [embed.build()]})
 
@@ -55,16 +58,12 @@ export default class Play extends MusicCommand implements Command {
         else{
             let embed = new Embeds({
                 hexColor: ColorsEnum.YELLOW,
-                description: `**🎵 Searching 🔎 ${url.concat(" ")}**`,
+                description: `**🎵 Searching 🔎 ${url[0]}**`,
             });
             await message.reply({embeds: [embed.build()]})
         }
 
         if (!validateURL(url[0])) {
-            if (url instanceof Array)
-                url = [url.join(' ')]
-            else url = [url]
-
             url = [
                 (await axios.get(`${environment.ytdSearchURL}${url[0].replace(' ', '%20')}`))
                     .data.data[0].url
