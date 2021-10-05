@@ -1,11 +1,3 @@
-import Queue from "../music/queue";
-import {CommandInteraction, GuildMember, Message} from "discord.js";
-import assert from "assert";
-import UserNotInAVoiceChannel from "../errors/userNotInAVoiceChannel";
-import NoRemaingTracks from "../errors/noRemaingTracks";
-import BotNotInAVoiceChannel from "../errors/botNotInAVoiceChannel";
-import UserInWrongChannel from "../errors/userInWrongChannel";
-
 export default class Utils{
 
 
@@ -34,25 +26,5 @@ export default class Utils{
             multi *= 60;
         }
         return total;
-    }
-
-    static isInSameVoiceChannel(track: Queue | undefined, message: Message | CommandInteraction, needsTrack: boolean = true): void{
-        assert(message.member instanceof GuildMember,"Missing instanceof Guildmember check")
-        if (!message.member.voice.channel)
-            throw new UserNotInAVoiceChannel();
-
-
-        if (!track || track.audios.length == 0 ){
-            if(needsTrack)
-                throw new NoRemaingTracks();
-        } else {
-            if (!track.voiceConnection) {
-                throw new BotNotInAVoiceChannel();
-            }
-
-            if(track.voiceConnection.joinConfig.channelId != message.member.voice.channel.id){
-                throw new UserInWrongChannel();
-            }
-        }
     }
 }

@@ -1,13 +1,14 @@
 import { joinVoiceChannel} from "@discordjs/voice";
 import {CommandInteraction, GuildMember, Message, StageChannel, VoiceChannel} from "discord.js";
 import { Command } from "./command";
-import {getBasicInfo, validateURL, videoInfo} from 'ytdl-core';
+import {getBasicInfo, validateURL} from 'ytdl-core';
 import Queue from "../music/queue";
 import axios from "axios";
 import { environment } from "../environments/environment";
 import MusicCommand from "./musicCommand";
 import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
+import MusicController from "../music/musicController";
 
 export default class Play extends MusicCommand implements Command {
 
@@ -70,7 +71,7 @@ export default class Play extends MusicCommand implements Command {
             ]
         }
 
-        const track: Queue | undefined = this.musicController.guilds.get(channel.guildId)
+        const track: Queue | undefined = MusicController.guilds.get(channel.guildId)
         if (track) {
             if (track.voiceConnection.joinConfig.channelId != channel.id) {
                 let embed = new Embeds({
@@ -82,6 +83,12 @@ export default class Play extends MusicCommand implements Command {
             }
 
         } else {
+            // Suggestion
+            // // Fix a bug that if 2 people try to play two musics at the same time the bot will only queue one
+            // if( track!.audioPlayer.state.status == "buffering"){
+            //     // tell user to try again after a few seconds or schedule it to be done later
+            // }
+
             this.musicController.configGuildQueue(
                 joinVoiceChannel({
                     channelId: channel.id,
@@ -95,9 +102,8 @@ export default class Play extends MusicCommand implements Command {
 
 
         // TODO fix bug where bot cant parse a video that is age restricted this try catch was made so the bot doesnt crash
-        let info: videoInfo | string = "Teste";
         try {
-            info = await getBasicInfo(url[0])
+            let info = await getBasicInfo(url[0])
             let embed = new Embeds({
                 hexColor: ColorsEnum.GRAY,
                 description: `${info.videoDetails.title} Added to queue`,
@@ -111,8 +117,8 @@ export default class Play extends MusicCommand implements Command {
                 await message.editReply({embeds:[embed.build()]})
                 await this.musicController.addQueue(channel.guildId, info, null)
             }
-        } catch {
-            console.log(info);
+        } catch (e : unknown){
+            console.log("Bot failed to parse, probably it is and adult video");
             await message.reply("Something went very wrong")
         }
     }

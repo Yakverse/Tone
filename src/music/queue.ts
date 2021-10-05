@@ -3,6 +3,9 @@ import {AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, VoiceC
 import { CommandInteraction, Message } from "discord.js";
 import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
+import NoRemaingTracks from "../errors/noRemaingTracks";
+import MusicAlreadyPaused from "../errors/MusicAlreadyPaused";
+import MusicAlreadyPlaying from "../errors/MusicAlreadyPlaying";
 
 export default class Queue {
     // Nome - Duração
@@ -37,6 +40,21 @@ export default class Queue {
         this.message = message;
     }
 
+    pause(){
+        if( this.audioPlayer.state.status == "paused"){
+            throw new MusicAlreadyPaused();
+        }
+        this.audioPlayer.pause();
+    }
+
+    resume(){
+        if( this.audioPlayer.state.status == "playing"){
+            throw new MusicAlreadyPlaying();
+        }
+        this.audioPlayer.unpause();
+    }
+
+
     private clearAudios(){
         this.audios = []
         this.audiosInfo = [];
@@ -60,8 +78,20 @@ export default class Queue {
     }
 
     skip(){
-        this.audioPlayer.stop()
-        this.actualAudio = undefined
+        if(this.audios.length == 0){
+            throw new NoRemaingTracks();
+        }
+
+        console.log(this.audioPlayer.state.status)
+
+        if(this.audioPlayer.state.status === AudioPlayerStatus.Buffering){
+            this.audioPlayer.once('stateChange', async (oldState, newState) => {
+                if (newState.status === AudioPlayerStatus.Playing && oldState.status === AudioPlayerStatus.Buffering) this.skip();
+            })
+        } else {
+            this.audioPlayer.stop();
+            this.actualAudio = undefined;
+        }
     }
 
     leave(){

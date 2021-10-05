@@ -5,6 +5,7 @@ import MusicCommand from "./musicCommand";
 import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import Utils from "../utils/utils";
+import MusicController from "../music/musicController";
 
 export default class QueueCommand extends MusicCommand implements Command {
 
@@ -15,7 +16,7 @@ export default class QueueCommand extends MusicCommand implements Command {
     execute(message: Message | CommandInteraction): void{
         if (message.member instanceof GuildMember && message.member.voice.channel) {
             const guildId: string = message.member.guild.id;
-            let currQueue: Queue | undefined = this.musicController.guilds.get(guildId);
+            let currQueue: Queue | undefined = MusicController.guilds.get(guildId);
             if (currQueue){
                 let currindex = currQueue.indexActualAudio;
                 let musicQueue = currQueue.audiosInfo;
