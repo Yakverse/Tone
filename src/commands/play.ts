@@ -47,7 +47,7 @@ export default class Play extends MusicCommand implements Command {
         if (!(message instanceof CommandInteraction)){
             let embed = new Embeds({
                 hexColor: ColorsEnum.YELLOW,
-                description: `**🎵 Searching 🔎 ${url[0]}**`,
+                description: `**🎵 Searching 🔎 ${url.concat(" ")}**`,
             });
             message = await message.reply({embeds: [embed.build()]})
 
@@ -55,7 +55,7 @@ export default class Play extends MusicCommand implements Command {
         else{
             let embed = new Embeds({
                 hexColor: ColorsEnum.YELLOW,
-                description: `**🎵 Searching 🔎 ${url[0]}**`,
+                description: `**🎵 Searching 🔎 ${url.concat(" ")}**`,
             });
             await message.reply({embeds: [embed.build()]})
         }
@@ -83,12 +83,6 @@ export default class Play extends MusicCommand implements Command {
             }
 
         } else {
-            // Suggestion
-            // // Fix a bug that if 2 people try to play two musics at the same time the bot will only queue one
-            // if( track!.audioPlayer.state.status == "buffering"){
-            //     // tell user to try again after a few seconds or schedule it to be done later
-            // }
-
             this.musicController.configGuildQueue(
                 joinVoiceChannel({
                     channelId: channel.id,
