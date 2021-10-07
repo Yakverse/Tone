@@ -6,6 +6,8 @@ import {ColorsEnum} from "../enumerations/Colors.enum";
 import NoRemaingTracks from "../errors/noRemaingTracks";
 import MusicAlreadyPaused from "../errors/MusicAlreadyPaused";
 import MusicAlreadyPlaying from "../errors/MusicAlreadyPlaying";
+import App from "../main";
+import { LogTypeEnum } from "../enumerations/logType.enum";
 
 export default class Queue {
     // Nome - Duração
@@ -82,8 +84,6 @@ export default class Queue {
             throw new NoRemaingTracks();
         }
 
-        console.log(this.audioPlayer.state.status)
-
         if(this.audioPlayer.state.status === AudioPlayerStatus.Buffering){
             this.audioPlayer.once('stateChange', async (oldState, newState) => {
                 if (newState.status === AudioPlayerStatus.Playing && oldState.status === AudioPlayerStatus.Buffering) this.skip();
@@ -118,14 +118,21 @@ export default class Queue {
             const audioResource: AudioResource<Audio> = await this.actualAudio.createAudio()
             this.audioPlayer.play(audioResource)
 
+            let title = audioResource.metadata.info.videoDetails.title
+
+            if (this.message.guild) App.logger.send(LogTypeEnum.PLAY_MUSIC, `Playing ${title} in ${this.message.guild.name}`)
+            else App.logger.send(LogTypeEnum.PLAY_MUSIC, `Playing ${title} in DM`)
+
             let embed = new Embeds({
                 hexColor: ColorsEnum.GREEN,
-                description: `Now playing ${audioResource.metadata.info.videoDetails.title}`,
+                description: `Now playing ${title}`,
             })
 
             if (this.message && this.message instanceof Message) await this.message.edit({ embeds: [embed.build()] })
             else if (this.message) await this.message.editReply({ embeds: [embed.build()] })
         }
-        catch (e) { console.log(e) }
+        catch (e) { 
+            App.logger.send(LogTypeEnum.ERROR, `${e}`)
+        }
     }
 }

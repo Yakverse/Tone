@@ -1,8 +1,10 @@
-import {Client, CommandInteraction, Interaction, Message} from "discord.js";
+import {Client, CommandInteraction, Guild, Interaction, Message} from "discord.js";
 import { CommandFactory } from "../commands/commandFactory";
 import { environment } from "../environments/environment";
 import BotError from "../errors/botError";
 import {ErrorEmbed} from "../embeds/errorEmbed";
+import App from "../main";
+import { LogTypeEnum } from "../enumerations/logType.enum";
 
 export class Event {
 
@@ -11,6 +13,8 @@ export class Event {
     constructor(client: Client){
         client.on('messageCreate', (message: Message) => { this.onMessage(message) })
         client.on('interactionCreate', (interaction: Interaction) => { this.onInteraction(interaction) })
+        client.on('guildCreate', (guild: Guild) => { this.onGuildAdd(guild.name, client.guilds.cache.size) })
+        client.on('guildDelete', (guild: Guild) => { this.onGuildRemove(guild.name, client.guilds.cache.size) })
     }
 
     onMessage(message: Message): void {
@@ -40,7 +44,11 @@ export class Event {
         }
     }
 
+    onGuildAdd(guildName: string, numberGuilds: number){ App.logger.send(LogTypeEnum.JOIN_NEW_GUILD, `Joined a new guild: ${guildName} - Total servers: ${numberGuilds}`) }
+    onGuildRemove(guildName: string, numberGuilds: number){ App.logger.send(LogTypeEnum.REMOVE_GUILD, `Removed from guild: ${guildName} - Total servers: ${numberGuilds}`) }
+
     private handlerException(message: CommandInteraction | Message, exception: unknown): void {
+        App.logger.send(LogTypeEnum.ERROR, `${exception}`);
         if (exception instanceof BotError)
             message.reply({embeds:[new ErrorEmbed(exception.message).build()]});
         else message.reply({embeds:[new ErrorEmbed("Something went wrong").build()]})

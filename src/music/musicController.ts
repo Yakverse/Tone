@@ -17,7 +17,6 @@ export default class MusicController {
         throw new BotNotInAVoiceChannel();
     }
 
-
     configGuildQueue(voiceConnection: VoiceConnection, guildId: string, message: Message | CommandInteraction){
 
         let queue: Queue | undefined = MusicController.guilds.get(guildId)
@@ -25,6 +24,7 @@ export default class MusicController {
 
         queue!.addListener()
     }
+    
     pause(message: Message | CommandInteraction){
         MusicController.isInSameVoiceChannel(message)
         MusicController.getQueue(message.guildId!).pause();

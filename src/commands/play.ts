@@ -9,6 +9,8 @@ import MusicCommand from "./musicCommand";
 import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import MusicController from "../music/musicController";
+import App from "../main";
+import { LogTypeEnum } from "../enumerations/logType.enum";
 
 export default class Play extends MusicCommand implements Command {
 
@@ -93,7 +95,6 @@ export default class Play extends MusicCommand implements Command {
             )
         }
 
-
         // TODO fix bug where bot cant parse a video that is age restricted this try catch was made so the bot doesnt crash
         try {
             let info = await getBasicInfo(url[0])
@@ -111,7 +112,7 @@ export default class Play extends MusicCommand implements Command {
                 await this.musicController.addQueue(channel.guildId, info, null)
             }
         } catch (e : unknown){
-            console.log("Bot failed to parse, probably it is and adult video");
+            App.logger.send(LogTypeEnum.ERROR, "Bot failed to parse, probably it is and adult video");
             await message.reply("Something went very wrong")
         }
     }

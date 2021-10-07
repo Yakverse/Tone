@@ -22,7 +22,6 @@ export class Embeds{
         if (!options.description) options.description = undefined
         if (!options.user) options.user = undefined
         if (!options.hexColor) options.hexColor = undefined
-
     }
 
     setDescription(text: string){

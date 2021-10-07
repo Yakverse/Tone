@@ -89,6 +89,7 @@ export default class Bot {
         
         this.client.login(token).then((res: string) => {
             console.log('BOT ONLINE');
+            console.log(`Total guilds: ${this.client.guilds.cache.size}`)
             
             if (res === this.token) this.addSlashCommands();
             else throw new Error('Login error');         

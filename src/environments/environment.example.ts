@@ -1,5 +1,7 @@
 export const environment = {
     token: '',
     prefix: '',
-    ytdSearchURL: ''
+    ytdSearchURL: '',
+    log: '',
+    newRelicKey: ''
 }
