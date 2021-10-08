@@ -2,7 +2,7 @@ import {joinVoiceChannel, VoiceConnection} from "@discordjs/voice";
 import { videoInfo } from 'ytdl-core';
 import Audio from "./audio";
 import Queue from "./queue";
-import {CommandInteraction, GuildMember, Message} from "discord.js";
+import {ButtonInteraction, CommandInteraction, GuildMember, Message} from "discord.js";
 import UserNotInAVoiceChannel from "../errors/userNotInAVoiceChannel";
 import BotNotInAVoiceChannel from "../errors/botNotInAVoiceChannel";
 import UserInWrongChannel from "../errors/userInWrongChannel";
@@ -113,7 +113,7 @@ export default class MusicController {
     }
 
 
-    static isInSameVoiceChannel(message: Message | CommandInteraction): void{
+    public static isInSameVoiceChannel(message: Message | CommandInteraction | ButtonInteraction): void{
         let track: Queue | undefined = MusicController.guilds.get(message.guildId!);
 
         if (!(message.member instanceof GuildMember)){

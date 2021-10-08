@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import {ButtonInteraction, CommandInteraction, Message} from "discord.js";
 
 export interface Command {
 
@@ -6,6 +6,6 @@ export interface Command {
     description: string
     options: Array<string> | null
 
-    execute(message: Message | CommandInteraction, args: Array<string> | null): void
+    execute(message: Message | CommandInteraction | ButtonInteraction, args: Array<string> | null): void
 
 }

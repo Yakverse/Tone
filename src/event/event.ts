@@ -1,4 +1,4 @@
-import {Client, CommandInteraction, Guild, Interaction, Message} from "discord.js";
+import {ButtonInteraction, Client, CommandInteraction, Guild, Interaction, Message} from "discord.js";
 import { CommandFactory } from "../commands/commandFactory";
 import { environment } from "../environments/environment";
 import BotError from "../errors/botError";
@@ -6,10 +6,12 @@ import {ErrorEmbed} from "../embeds/errorEmbed";
 import App from "../main";
 import { LogTypeEnum } from "../enumerations/logType.enum";
 import InvalidCommand from "../errors/invalidCommand";
+import {ButtonFactory} from "../commands/buttonFactory";
 
 export class Event {
 
-    commandFactory: CommandFactory = new CommandFactory()
+    commandFactory: CommandFactory = new CommandFactory();
+    buttonFactory: ButtonFactory = new ButtonFactory();
 
     constructor(client: Client){
         client.on('messageCreate', (message: Message) => { this.onMessage(message) })
@@ -38,24 +40,38 @@ export class Event {
     }
 
     onInteraction(interaction: Interaction): void {
-        if (!interaction.isCommand()) return
-
-        try { this.commandFactory.factory(interaction.commandName).execute(interaction, null) }
-        catch (e: unknown) {
-            this.handlerException(interaction, e)
+        try{
+            if (interaction.isCommand()){
+                this.commandFactory.factory(interaction.commandName).execute(interaction, null)
+            } else if (interaction.isButton()) {
+                this.buttonFactory.factory(interaction.customId).execute(interaction, null)
+            } else {
+                return;
+            }
+        } catch (e) {
+            this.handlerException(interaction, e);
         }
     }
 
     onGuildAdd(guildName: string, numberGuilds: number){ App.logger.send(LogTypeEnum.JOIN_NEW_GUILD, `Joined a new guild: ${guildName} - Total servers: ${numberGuilds}`) }
     onGuildRemove(guildName: string, numberGuilds: number){ App.logger.send(LogTypeEnum.REMOVE_GUILD, `Removed from guild: ${guildName} - Total servers: ${numberGuilds}`) }
 
-    private handlerException(message: CommandInteraction | Message, exception: unknown): void {
+    private handlerException(message: Message | Interaction , exception: unknown): void {
         let invalidCommandException = exception as InvalidCommand
         App.logger.send(LogTypeEnum.ERROR, `${invalidCommandException.message}`);
-        if (exception instanceof BotError)
-            message.reply({embeds:[new ErrorEmbed(exception.message).build()]});
-        else message.reply({embeds:[new ErrorEmbed("Something went wrong").build()]})
+        if (exception instanceof BotError){
+            if(!(message instanceof Interaction))
+                message.reply({embeds:[new ErrorEmbed(exception.message).build()]});
+            else if (message instanceof CommandInteraction)
+                message.editReply({embeds:[new ErrorEmbed(exception.message).build()]});
+            else if (message instanceof ButtonInteraction)
+                message.reply({ephemeral: true, embeds:[new ErrorEmbed(exception.message).build()], content:null , components: []})
+        }
+        else{
+            message.channel!.send({embeds:[new ErrorEmbed("Something went wrong").build()]});
+        }
     }
+
 
 
 }
