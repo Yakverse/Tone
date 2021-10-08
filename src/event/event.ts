@@ -5,6 +5,7 @@ import BotError from "../errors/botError";
 import {ErrorEmbed} from "../embeds/errorEmbed";
 import App from "../main";
 import { LogTypeEnum } from "../enumerations/logType.enum";
+import InvalidCommand from "../errors/invalidCommand";
 
 export class Event {
 
@@ -25,6 +26,7 @@ export class Event {
 
             let command: string = args[0].split(environment.prefix)[1]
             if (!command) return
+            command = command.toLowerCase()
 
             args.shift()
 
@@ -48,7 +50,8 @@ export class Event {
     onGuildRemove(guildName: string, numberGuilds: number){ App.logger.send(LogTypeEnum.REMOVE_GUILD, `Removed from guild: ${guildName} - Total servers: ${numberGuilds}`) }
 
     private handlerException(message: CommandInteraction | Message, exception: unknown): void {
-        App.logger.send(LogTypeEnum.ERROR, `${exception}`);
+        let invalidCommandException = exception as InvalidCommand
+        App.logger.send(LogTypeEnum.ERROR, `${invalidCommandException.message}`);
         if (exception instanceof BotError)
             message.reply({embeds:[new ErrorEmbed(exception.message).build()]});
         else message.reply({embeds:[new ErrorEmbed("Something went wrong").build()]})

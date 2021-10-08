@@ -12,7 +12,8 @@ export default class Logger {
         let payload = {
             timestamp: new Date().getTime(),
             message: message,
-            logtype: logType
+            logtype: logType,
+            service: 'tonebot-log'
         }
 
         let options: AxiosRequestConfig = {
