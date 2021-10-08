@@ -11,10 +11,17 @@ export default class Utils{
         return text.padEnd(STRING_SIZE," ");
     }
 
-    static parseSecondsToISO(seconds: number): string{
-        if (seconds < 3600)
-            return new Date(seconds * 1000).toISOString().substr(14, 5);
-        return new Date(seconds * 1000).toISOString().substr(11, 8)
+    static parseSecondsToISO(lenghtSeconds: number): string{
+        let seconds = lenghtSeconds % 60;
+        let minutes = seconds/60>>0%60;
+        let hours = seconds/3600>>0;
+        let response = "";
+
+        if(hours > 0)
+            response += `${hours}:`
+        response += `${minutes}:${seconds}`
+        return response
+
     }
 
     static parseISOToSeconds(ISO : string): number{

@@ -8,11 +8,12 @@ import MusicAlreadyPaused from "../errors/MusicAlreadyPaused";
 import MusicAlreadyPlaying from "../errors/MusicAlreadyPlaying";
 import App from "../main";
 import { LogTypeEnum } from "../enumerations/logType.enum";
+import BotIsProcessingError from "../errors/BotIsProcessingError";
 
 export default class Queue {
     // Nome - Duração
     audiosInfo: Array<[string, number]> = new Array<[string, number]>();
-
+    queueTime: number = 0;
     audios: Array<Audio> = new Array<Audio>();
     audioPlayer: AudioPlayer = createAudioPlayer();
     actualAudio: Audio | undefined;
@@ -30,10 +31,10 @@ export default class Queue {
     }
 
     addAudio(audio: Audio){
-
         let time = parseInt(audio.info.videoDetails.lengthSeconds);
         let title = audio.info.videoDetails.title;
 
+        this.queueTime += time;
         this.audiosInfo.push([title, time]);
         this.audios.push(audio);
     }
@@ -60,6 +61,7 @@ export default class Queue {
     private clearAudios(){
         this.audios = []
         this.audiosInfo = [];
+        this.queueTime = 0;
         this.indexActualAudio = 0
         this.timesToPlay = 1
         this.audioPlayer.stop()
@@ -84,14 +86,11 @@ export default class Queue {
             throw new NoRemaingTracks();
         }
 
-        if(this.audioPlayer.state.status === AudioPlayerStatus.Buffering){
-            this.audioPlayer.once('stateChange', async (oldState, newState) => {
-                if (newState.status === AudioPlayerStatus.Playing && oldState.status === AudioPlayerStatus.Buffering) this.skip();
-            })
-        } else {
-            this.audioPlayer.stop();
-            this.actualAudio = undefined;
+        if(this.audioPlayer.state.status === AudioPlayerStatus.Idle){
+            throw new BotIsProcessingError();
         }
+        this.audioPlayer.stop();
+        this.actualAudio = undefined;
     }
 
     leave(){
@@ -131,7 +130,7 @@ export default class Queue {
             if (this.message && this.message instanceof Message) await this.message.edit({ embeds: [embed.build()] })
             else if (this.message) await this.message.editReply({ embeds: [embed.build()] })
         }
-        catch (e) { 
+        catch (e) {
             App.logger.send(LogTypeEnum.ERROR, `${e}`)
         }
     }
