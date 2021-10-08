@@ -28,6 +28,8 @@ export class CommandFactory {
                 return new commands.Help()
             case 'queue':
                 return new commands.Queue()
+            case 'invite':
+                return new commands.Invite()
             default:
                 throw new InvalidCommand();
         }

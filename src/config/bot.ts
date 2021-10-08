@@ -81,6 +81,10 @@ export default class Bot {
                 name: 'queue',
                 description: 'show the current server queue',
             },
+            {
+                name: 'invite',
+                description: 'invite me to your discord server'
+            }
         ]
     }
 

@@ -3,5 +3,6 @@ export const environment = {
     prefix: '',
     ytdSearchURL: '',
     log: '',
-    newRelicKey: ''
+    newRelicKey: '',
+    inviteURL: ''
 }
