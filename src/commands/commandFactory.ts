@@ -30,6 +30,8 @@ export class CommandFactory {
                 return new commands.Queue()
             case 'invite':
                 return new commands.Invite()
+            case 'join':
+                return new commands.Join()
             default:
                 throw new InvalidCommand();
         }
