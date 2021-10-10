@@ -3,7 +3,7 @@ import {AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, VoiceC
 import { CommandInteraction, Message } from "discord.js";
 import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
-import NoRemaingTracks from "../errors/noRemaingTracks";
+import NoTracksToSkip from "../errors/noTracksToSkip";
 import MusicAlreadyPaused from "../errors/MusicAlreadyPaused";
 import MusicAlreadyPlaying from "../errors/MusicAlreadyPlaying";
 import App from "../main";
@@ -86,7 +86,7 @@ export default class Queue {
 
     skip(){
         if(this.audios.length == 0){
-            throw new NoRemaingTracks();
+            throw new NoTracksToSkip();
         }
 
         if(this.audioPlayer.state.status === AudioPlayerStatus.Idle){
