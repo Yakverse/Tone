@@ -118,7 +118,6 @@ export default class MusicController {
         }
     }
 
-
     public static isInSameVoiceChannel(message: Message | CommandInteraction | ButtonInteraction): void{
         let track: Queue | undefined = MusicController.guilds.get(message.guildId!);
 

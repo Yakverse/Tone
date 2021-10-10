@@ -110,7 +110,7 @@ export default class Queue {
             }
             else if (this.timesToPlay === 0) {
                 this.clearAudios()
-                this.leaveOnInactiveTimeout()
+                App.InactivityHandler.createNoMusicTimeout(this.message.guild!.id, this)
                 return
             }
         } else this.indexActualAudio++
@@ -118,6 +118,7 @@ export default class Queue {
         try {
             this.actualAudio = this.audios[this.indexActualAudio]
             const audioResource: AudioResource<Audio> = await this.actualAudio.createAudio()
+            App.InactivityHandler.deleteNoMusicTimeout(this.message.guild!.id)
             this.audioPlayer.play(audioResource)
 
             let title = audioResource.metadata.info.videoDetails.title
@@ -136,21 +137,5 @@ export default class Queue {
         catch (e) {
             App.logger.send(LogTypeEnum.ERROR, `${e}`)
         }
-    }
-
-    private leaveOnInactiveTimeout(){
-        setTimeout(async () => {
-            if (!this.audios.length){
-                this.leave()
-
-                let embed = new Embeds({
-                    hexColor: ColorsEnum.BLUE,
-                    description: `Leaving due inactivity`,
-                })
-                            
-                if (this.message && this.message instanceof Message) await this.message.edit({ embeds: [embed.build()] })
-                else if (this.message) await this.message.editReply({ embeds: [embed.build()] })
-            }
-        }, 5* 60 * 1000)
     }
 }

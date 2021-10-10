@@ -23,6 +23,7 @@
     "axios": "^0.21.4",
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.1.0",
+    "ffmpeg-static": "^4.4.0",
     "libsodium-wrappers": "^0.7.9",
     "tsc-watch": "^4.5.0",
     "youtube-dl-exec": "^1.2.6",

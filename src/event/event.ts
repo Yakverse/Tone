@@ -18,7 +18,7 @@ export class Event {
         client.on('interactionCreate', (interaction: Interaction) => { this.onInteraction(interaction) })
         client.on('guildCreate', (guild: Guild) => { this.onGuildAdd(guild.name, client.guilds.cache.size) })
         client.on('guildDelete', (guild: Guild) => { this.onGuildRemove(guild.name, client.guilds.cache.size) })
-        client.on('voiceStateUpdate', (oldState: VoiceState) => { this.onVoiceStateUpdate(oldState) })
+        client.on('voiceStateUpdate', (oldState: VoiceState, newState: VoiceState) => { this.onVoiceStateUpdate(oldState, newState) })
     }
 
     onMessage(message: Message): void {
@@ -57,34 +57,33 @@ export class Event {
     onGuildAdd(guildName: string, numberGuilds: number){ App.logger.send(LogTypeEnum.JOIN_NEW_GUILD, `Joined a new guild: ${guildName} - Total servers: ${numberGuilds}`) }
     onGuildRemove(guildName: string, numberGuilds: number){ App.logger.send(LogTypeEnum.REMOVE_GUILD, `Removed from guild: ${guildName} - Total servers: ${numberGuilds}`) }
 
-    onVoiceStateUpdate(oldState: VoiceState) {
-        if (!oldState.channel || !oldState.guild.me) return
+    onVoiceStateUpdate(oldState: VoiceState, newState: VoiceState) {
+        if (!oldState.channel || !oldState.guild.me || !newState.guild.me) return
+
+        if (newState.channelId === newState.guild.me.voice.channelId) 
+            return App.InactivityHandler.deleteAloneTimeout(newState.guild.id)
         
         if (oldState.channelId !== oldState.guild.me.voice.channelId) return
         
-        if (!(oldState.channel.members.size - 1)) this.leaveOnInactiveTimeout(oldState)
+        if (!(oldState.channel.members.size - 1)) App.InactivityHandler.createAloneTimeout(oldState.guild.id, oldState)
     }
 
     private handlerException(message: Message | Interaction , exception: unknown): void {
         let invalidCommandException = exception as InvalidCommand
         App.logger.send(LogTypeEnum.ERROR, `${invalidCommandException.message}`);
+
         if (exception instanceof BotError){
             if(!(message instanceof Interaction))
-                message.reply({embeds:[new ErrorEmbed(exception.message).build()]});
+                message.reply({ embeds: [new ErrorEmbed(exception.message).build()] });
+
             else if (message instanceof CommandInteraction)
-                message.editReply({embeds:[new ErrorEmbed(exception.message).build()]});
+                message.editReply({ embeds: [new ErrorEmbed(exception.message).build()] });
+
             else if (message instanceof ButtonInteraction)
-                message.reply({ephemeral: true, embeds:[new ErrorEmbed(exception.message).build()], content:null , components: []})
+                message.reply({ ephemeral: true, embeds:[new ErrorEmbed(exception.message).build()], content:null , components: [] })
         }
         else{
-            message.channel!.send({embeds:[new ErrorEmbed("Something went wrong").build()]});
+            message.channel!.send({ embeds: [new ErrorEmbed("Something went wrong").build()] });
         }
-    }
-
-    private leaveOnInactiveTimeout(oldState: VoiceState){
-        setTimeout(() => {
-            if (!(oldState.channel!.members.size - 1))
-                App.musicController.leave(null, oldState.guild.id)
-        }, 5 * 60 * 1000) // 5min
     }
 }
