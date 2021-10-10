@@ -57,7 +57,6 @@ export default class Queue {
         this.audioPlayer.unpause();
     }
 
-
     private clearAudios(){
         this.audios = []
         this.audiosInfo = [];
@@ -108,6 +107,7 @@ export default class Queue {
             }
             else if (this.timesToPlay === 0) {
                 this.clearAudios()
+                this.leaveOnInactiveTimeout()
                 return
             }
         } else this.indexActualAudio++
@@ -133,5 +133,21 @@ export default class Queue {
         catch (e) {
             App.logger.send(LogTypeEnum.ERROR, `${e}`)
         }
+    }
+
+    private leaveOnInactiveTimeout(){
+        setTimeout(async () => {
+            if (!this.audios.length){
+                this.leave()
+
+                let embed = new Embeds({
+                    hexColor: ColorsEnum.BLUE,
+                    description: `Leaving due inactivity`,
+                })
+                            
+                if (this.message && this.message instanceof Message) await this.message.edit({ embeds: [embed.build()] })
+                else if (this.message) await this.message.editReply({ embeds: [embed.build()] })
+            }
+        }, 5* 60 * 1000)
     }
 }

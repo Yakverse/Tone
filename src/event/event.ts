@@ -1,4 +1,4 @@
-import {Client, CommandInteraction, Guild, Interaction, Message} from "discord.js";
+import {Client, CommandInteraction, Guild, Interaction, Message, VoiceState} from "discord.js";
 import { CommandFactory } from "../commands/commandFactory";
 import { environment } from "../environments/environment";
 import BotError from "../errors/botError";
@@ -16,6 +16,7 @@ export class Event {
         client.on('interactionCreate', (interaction: Interaction) => { this.onInteraction(interaction) })
         client.on('guildCreate', (guild: Guild) => { this.onGuildAdd(guild.name, client.guilds.cache.size) })
         client.on('guildDelete', (guild: Guild) => { this.onGuildRemove(guild.name, client.guilds.cache.size) })
+        client.on('voiceStateUpdate', (oldState: VoiceState) => { this.onVoiceStateUpdate(oldState) })
     }
 
     onMessage(message: Message): void {
@@ -49,6 +50,14 @@ export class Event {
     onGuildAdd(guildName: string, numberGuilds: number){ App.logger.send(LogTypeEnum.JOIN_NEW_GUILD, `Joined a new guild: ${guildName} - Total servers: ${numberGuilds}`) }
     onGuildRemove(guildName: string, numberGuilds: number){ App.logger.send(LogTypeEnum.REMOVE_GUILD, `Removed from guild: ${guildName} - Total servers: ${numberGuilds}`) }
 
+    onVoiceStateUpdate(oldState: VoiceState) {
+        if (!oldState.channel || !oldState.guild.me) return
+        
+        if (oldState.channelId !== oldState.guild.me.voice.channelId) return
+        
+        if (!(oldState.channel.members.size - 1)) this.leaveOnInactiveTimeout(oldState)
+    }
+
     private handlerException(message: CommandInteraction | Message, exception: unknown): void {
         let invalidCommandException = exception as InvalidCommand
         App.logger.send(LogTypeEnum.ERROR, `${invalidCommandException.message}`);
@@ -57,5 +66,10 @@ export class Event {
         else message.reply({embeds:[new ErrorEmbed("Something went wrong").build()]})
     }
 
-
+    private leaveOnInactiveTimeout(oldState: VoiceState){
+        setTimeout(() => {
+            if (!(oldState.channel!.members.size - 1))
+                App.musicController.leave(null, oldState.guild.id)
+        }, 5 * 60 * 1000) // 5min
+    }
 }

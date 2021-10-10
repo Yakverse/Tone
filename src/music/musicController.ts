@@ -11,7 +11,7 @@ export default class MusicController {
 
     static guilds: Map<string, Queue> = new Map<string, Queue>();
 
-    private static getQueue(guildId: string): Queue{
+    static getQueue(guildId: string): Queue{
         const queue: Queue | undefined = MusicController.guilds.get(guildId)
         if (queue) return queue;
         throw new BotNotInAVoiceChannel();
@@ -35,10 +35,16 @@ export default class MusicController {
         MusicController.getQueue(message.guildId!).resume();
     }
 
-    leave(message: Message | CommandInteraction){
-        MusicController.isInSameVoiceChannel(message)
-        MusicController.getQueue(message.guildId!).leave();
-        MusicController.guilds.delete(message.guildId!);
+    // TODO remove leave from MusicController
+    leave(message: Message | CommandInteraction | null, guildId: string | undefined = undefined){
+        if (message) {
+            MusicController.isInSameVoiceChannel(message)
+            MusicController.getQueue(message.guildId!).leave();
+            MusicController.guilds.delete(message.guildId!);
+        } else if (guildId) {
+            MusicController.getQueue(guildId).leave();
+            MusicController.guilds.delete(guildId);
+        }
     }
 
     stop(message: Message | CommandInteraction){

@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npx tsc",
     "start": "npm run build && node ./dist/main.js",
-    "start:watch": "tsc-watch --onSuccess \"node ./dist/main.js\""
+    "start:watch": "tsc-watch --onSuccess \"node ./dist/main.js --use_strict\""
   },
   "keywords": [],
   "author": "",
