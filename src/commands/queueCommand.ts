@@ -5,6 +5,7 @@ import MusicCommand from "./musicCommand";
 import Utils from "../utils/utils";
 import MusicController from "../music/musicController";
 import BotNotInAVoiceChannel from "../errors/botNotInAVoiceChannel";
+import NoTracksInQueue from "../errors/NoTracksInQueue";
 
 export default class QueueCommand extends MusicCommand implements Command {
 
@@ -18,13 +19,14 @@ export default class QueueCommand extends MusicCommand implements Command {
             const guildId: string = message.member.guild.id;
             let currQueue: Queue | undefined = MusicController.guilds.get(guildId);
             if (currQueue){
+                if(!currQueue.length){
+                    throw NoTracksInQueue;
+                }
                 const currindex = currQueue.indexActualAudio;
-
                 // Bithack for faster floor operation
                 // Force casts the float value into an int32_t
-                const lastPage = (currQueue.length / this.MUSICS_PER_PAGE >> 0)-1;
+                const lastPage = (currQueue.length-1) / this.MUSICS_PER_PAGE >> 0;
                 const currPage = this.getCurrPage(message,lastPage,currindex);
-
                 const messageContent = this.getMessageContent(currQueue,lastPage,currPage,currindex);
                 const actionRow = this.getActionRow(lastPage, currPage);
                 if (!(message instanceof ButtonInteraction)){
@@ -41,8 +43,7 @@ export default class QueueCommand extends MusicCommand implements Command {
     getMessageContent(currQueue:Queue,lastPage:number, currPage:number, currindex:number): string{
         let nMusicInCurrPage: number;
         if(lastPage == currPage){
-            // Use negative modulus + value to evade 0 value (faster than using an if(!nMusicInCurrPage))
-            nMusicInCurrPage = ((-currQueue.length) % this.MUSICS_PER_PAGE) + this.MUSICS_PER_PAGE;
+            nMusicInCurrPage = (currQueue.length % this.MUSICS_PER_PAGE) ? currQueue.length % this.MUSICS_PER_PAGE : this.MUSICS_PER_PAGE
         } else {
             nMusicInCurrPage = this.MUSICS_PER_PAGE;
         }
