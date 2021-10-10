@@ -84,6 +84,10 @@ export default class Bot {
             {
                 name: 'invite',
                 description: 'invite me to your discord server'
+            },
+            {
+                name: 'join',
+                description: 'join a voice channel'
             }
         ]
     }

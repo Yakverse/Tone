@@ -12,9 +12,10 @@ export default class Utils{
     }
 
     static parseSecondsToISO(lenghtSeconds: number): string{
-        let seconds = lenghtSeconds % 60;
-        let minutes = seconds/60>>0%60;
-        let hours = seconds/3600>>0;
+        let seconds = (lenghtSeconds % 60).toString();
+        seconds = seconds.length > 1 ? seconds.toString() : "0" + seconds.toString();
+        let minutes = lenghtSeconds/60>>0%60;
+        let hours = lenghtSeconds/3600>>0;
         let response = "";
 
         if(hours > 0)

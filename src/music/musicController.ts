@@ -1,11 +1,13 @@
-import { VoiceConnection } from "@discordjs/voice";
+import {joinVoiceChannel, VoiceConnection} from "@discordjs/voice";
 import { videoInfo } from 'ytdl-core';
 import Audio from "./audio";
 import Queue from "./queue";
-import {CommandInteraction, GuildMember, Message} from "discord.js";
+import {ButtonInteraction, CommandInteraction, GuildMember, Message} from "discord.js";
 import UserNotInAVoiceChannel from "../errors/userNotInAVoiceChannel";
 import BotNotInAVoiceChannel from "../errors/botNotInAVoiceChannel";
 import UserInWrongChannel from "../errors/userInWrongChannel";
+import {Embeds} from "../embeds/embed";
+import {ColorsEnum} from "../enumerations/Colors.enum";
 
 export default class MusicController {
 
@@ -81,7 +83,43 @@ export default class MusicController {
         queue.unloop()
     }
 
-    static isInSameVoiceChannel(message: Message | CommandInteraction): void{
+    join(message: Message | CommandInteraction){
+        if (message.member instanceof GuildMember && message.member.voice.channel) {
+            const channel = message.member.voice.channel
+            const track: Queue | undefined = MusicController.guilds.get(channel.guildId)
+            if (track) {
+                if (track.voiceConnection.joinConfig.channelId != channel.id) {
+                    let embed = new Embeds({
+                        hexColor: ColorsEnum.RED,
+                        description: `Sorry, I'm in OTHER channel with OTHER friends now`,
+                    });
+                    message.reply({embeds: [embed.build()]});
+                    return;
+                }
+
+            } else {
+                this.configGuildQueue(
+                    joinVoiceChannel({
+                        channelId: channel.id,
+                        guildId: channel.guild.id,
+                        adapterCreator: channel.guild.voiceAdapterCreator
+                    }),
+                    channel.guildId,
+                    message
+                )
+            }
+        } else {
+            let embed = new Embeds({
+                hexColor: ColorsEnum.RED,
+                description: '**You must be in a voice channel to use this command**',
+            })
+            message.reply({embeds: [embed.build()]})
+            return
+        }
+    }
+
+
+    public static isInSameVoiceChannel(message: Message | CommandInteraction | ButtonInteraction): void{
         let track: Queue | undefined = MusicController.guilds.get(message.guildId!);
 
         if (!(message.member instanceof GuildMember)){

@@ -19,6 +19,7 @@ export default class Queue {
     actualAudio: Audio | undefined;
     indexActualAudio: number = 0;
     timesToPlay: number = 1;
+    length: number = 0;
 
     constructor(public voiceConnection: VoiceConnection, public message: Message | CommandInteraction ) {}
 
@@ -35,6 +36,7 @@ export default class Queue {
         let title = audio.info.videoDetails.title;
 
         this.queueTime += time;
+        this.length +=1;
         this.audiosInfo.push([title, time]);
         this.audios.push(audio);
     }
@@ -65,6 +67,7 @@ export default class Queue {
         this.timesToPlay = 1
         this.audioPlayer.stop()
         this.actualAudio = undefined
+        this.length = 0;
     }
 
     stop(){
