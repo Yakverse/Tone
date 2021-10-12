@@ -27,6 +27,7 @@
     "libsodium-wrappers": "^0.7.9",
     "tsc-watch": "^4.5.0",
     "youtube-dl-exec": "^1.2.6",
+    "youtube-search-api": "^1.0.10",
     "ytdl-core": "^4.9.1"
   }
 }

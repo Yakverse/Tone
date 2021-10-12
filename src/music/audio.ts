@@ -1,16 +1,16 @@
 import { AudioResource, createAudioResource, demuxProbe } from "@discordjs/voice";
 import { raw as ytdl } from 'youtube-dl-exec';
-import {videoInfo} from "ytdl-core";
 import { LogTypeEnum } from "../enumerations/logType.enum";
 import App from "../main";
+import {SearchInfoDTO} from "../dto/SearchInfoDTO";
 
 export default class Audio {
 
-    constructor(public info: videoInfo) {}
+    constructor(public info: SearchInfoDTO) {}
 
     createAudio(): Promise<AudioResource<Audio>>{
         return new Promise((resolve, reject) => {
-            let url = this.info.videoDetails.video_url
+            let url: string = `https://www.youtube.com/watch?v=${this.info.id}`
             const process = ytdl(
                 url,
                 {

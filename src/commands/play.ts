@@ -1,13 +1,12 @@
 import {CommandInteraction, Message} from "discord.js";
 import { Command } from "./command";
-import {getBasicInfo, validateURL} from 'ytdl-core';
-import axios from "axios";
-import { environment } from "../environments/environment";
 import MusicCommand from "./musicCommand";
 import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import App from "../main";
 import { LogTypeEnum } from "../enumerations/logType.enum";
+import {SearchInfoDTO} from "../dto/SearchInfoDTO";
+const youtubesearchapi = require('youtube-search-api');
 
 export default class Play extends MusicCommand implements Command {
 
@@ -52,19 +51,13 @@ export default class Play extends MusicCommand implements Command {
             await message.reply({embeds: [embed.build()]})
         }
 
-        if (!validateURL(url[0])) {
-            url = [
-                (await axios.get(`${environment.ytdSearchURL}${url[0].replace(' ', '%20')}`))
-                    .data.data[0].url
-            ]
-        }
-
         // TODO fix bug where bot cant parse a video that is age restricted this try catch was made so the bot doesnt crash
         try {
-            let info = await getBasicInfo(url[0])
+            const info: SearchInfoDTO = (await youtubesearchapi.GetListByKeyword(url[0], false)).items[0]
+
             let embed = new Embeds({
                 hexColor: ColorsEnum.GRAY,
-                description: `${info.videoDetails.title} Added to queue`,
+                description: `${info.title} Added to queue`,
             })
 
             if (!(message instanceof CommandInteraction)){

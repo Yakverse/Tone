@@ -1,5 +1,4 @@
-import {joinVoiceChannel, VoiceConnection} from "@discordjs/voice";
-import { videoInfo } from 'ytdl-core';
+import {joinVoiceChannel, VoiceConnection} from "@discordjs/voice"
 import Audio from "./audio";
 import Queue from "./queue";
 import {ButtonInteraction, CommandInteraction, GuildMember, Message} from "discord.js";
@@ -8,6 +7,7 @@ import BotNotInAVoiceChannel from "../errors/botNotInAVoiceChannel";
 import UserInWrongChannel from "../errors/userInWrongChannel";
 import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
+import {SearchInfoDTO} from "../dto/SearchInfoDTO";
 
 export default class MusicController {
 
@@ -59,7 +59,7 @@ export default class MusicController {
         MusicController.getQueue(message.guildId!).skip()
     }
 
-    async addQueue(guildId: string, videoInfo: videoInfo, message: Message | null){
+    async addQueue(guildId: string, videoInfo: SearchInfoDTO, message: Message | null){
         const queue: Queue = MusicController.getQueue(guildId)
 
         if (message)

@@ -32,12 +32,12 @@ export default class Queue {
     }
 
     addAudio(audio: Audio){
-        let time = parseInt(audio.info.videoDetails.lengthSeconds);
-        let title = audio.info.videoDetails.title;
-
-        this.queueTime += time;
-        this.length +=1;
-        this.audiosInfo.push([title, time]);
+        // let time = parseInt(audio.info.length.simpleText);
+        // let title = audio.info.title;
+        //
+        // this.queueTime += time;
+        // this.length +=1;
+        // this.audiosInfo.push([title, time]);
         this.audios.push(audio);
     }
 
@@ -121,7 +121,7 @@ export default class Queue {
             App.InactivityHandler.deleteNoMusicTimeout(this.message.guild!.id)
             this.audioPlayer.play(audioResource)
 
-            let title = audioResource.metadata.info.videoDetails.title
+            let title = audioResource.metadata.info.title
 
             if (this.message.guild) App.logger.send(LogTypeEnum.PLAY_MUSIC, `Playing ${title} in ${this.message.guild.name}`)
             else App.logger.send(LogTypeEnum.PLAY_MUSIC, `Playing ${title} in DM`)
