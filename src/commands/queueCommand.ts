@@ -20,15 +20,15 @@ export default class QueueCommand extends MusicCommand implements Command {
             let currQueue: Queue | undefined = MusicController.guilds.get(guildId);
             if (currQueue){
                 if(!currQueue.length){
-                    throw NoTracksInQueue;
+                    throw new NoTracksInQueue;
                 }
-                const currindex = currQueue.indexActualAudio;
+                const currindex: number = currQueue.indexActualAudio;
                 // Bithack for faster floor operation
                 // Force casts the float value into an int32_t
-                const lastPage = (currQueue.length-1) / this.MUSICS_PER_PAGE >> 0;
-                const currPage = this.getCurrPage(message,lastPage,currindex);
-                const messageContent = this.getMessageContent(currQueue,lastPage,currPage,currindex);
-                const actionRow = this.getActionRow(lastPage, currPage);
+                const lastPage: number = (currQueue.length-1) / this.MUSICS_PER_PAGE >> 0;
+                const currPage: number = this.getCurrPage(message,lastPage,currindex);
+                const messageContent: string = this.getMessageContent(currQueue,lastPage,currPage,currindex);
+                const actionRow: MessageActionRow = this.getActionRow(lastPage, currPage);
                 if (!(message instanceof ButtonInteraction)){
                     message.reply({content:messageContent , components: [actionRow]});
                 } else {
@@ -48,15 +48,15 @@ export default class QueueCommand extends MusicCommand implements Command {
             nMusicInCurrPage = this.MUSICS_PER_PAGE;
         }
 
-        const isCurrentMusicInCurrentPage = currindex/this.MUSICS_PER_PAGE>>0 == currPage;
-        const STRING_PADDING = "\xa0".repeat(currindex.toString().length + 3);
+        const isCurrentMusicInCurrentPage: boolean = currindex/this.MUSICS_PER_PAGE>>0 == currPage;
+        const STRING_PADDING: string = "\xa0".repeat(currindex.toString().length + 3);
 
         // Maybe make a header in the future?
 
         // Body
-        let text = "```";
+        let text: string = "```";
         for ( let i = 0; i < nMusicInCurrPage; i++) {
-            let musInfo = currQueue.audiosInfo[currPage*this.MUSICS_PER_PAGE+i];
+            let musInfo: [string,number] = currQueue.audiosInfo[currPage*this.MUSICS_PER_PAGE+i];
             if(i == currindex%this.MUSICS_PER_PAGE && isCurrentMusicInCurrentPage ){
                 text += `${STRING_PADDING}⬐ current track\n`;
                 text += `${(currPage*this.MUSICS_PER_PAGE+i+1).toString()}. ${Utils.formatString(musInfo[0])} - ${Utils.parseSecondsToISO(musInfo[1])}\n`;
@@ -72,7 +72,7 @@ export default class QueueCommand extends MusicCommand implements Command {
     }
 
     getCurrPage(message:Message | CommandInteraction | ButtonInteraction, lastPage:number, currindex:number): number{
-        let currPage = currindex/this.MUSICS_PER_PAGE>>0;
+        let currPage:number = currindex/this.MUSICS_PER_PAGE>>0;
         if(message instanceof ButtonInteraction)
             switch (message.customId[1]) {
                 case "P":
@@ -100,7 +100,7 @@ export default class QueueCommand extends MusicCommand implements Command {
 
 
     getActionRow(nPages: number, currPage: number): MessageActionRow {
-        let row = new MessageActionRow();
+        let row: MessageActionRow = new MessageActionRow();
         if(nPages >= 0){
             if (currPage >= 0){
                 row.addComponents(
