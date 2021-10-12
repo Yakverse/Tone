@@ -2,11 +2,7 @@ export interface SearchInfoDTO{
     id: string,
     type: string,
     thumbnail: {
-        thumbnails: [
-            url: string,
-            width: number,
-            height: number
-        ]
+        thumbnails: [Thumbnail]
     }
     title: string,
     length: {
@@ -17,4 +13,10 @@ export interface SearchInfoDTO{
         },
         simpleText: string
     }
+}
+
+interface Thumbnail {
+    url: string,
+    width: number,
+    height: number
 }

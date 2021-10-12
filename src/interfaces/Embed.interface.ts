@@ -4,5 +4,8 @@ export interface EmbedInterface{
     title?: string;
     hexColor?: HexColorString;
     user?: User;
-    description?: string;
+    description?: string,
+    image?: string,
+    thumbnail?: string,
+    footer?: string
 }

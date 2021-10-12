@@ -121,15 +121,20 @@ export default class Queue {
             App.InactivityHandler.deleteNoMusicTimeout(this.message.guild!.id)
             this.audioPlayer.play(audioResource)
 
-            let title = audioResource.metadata.info.title
+            const title = audioResource.metadata.info.title
+            const image = audioResource.metadata.info.thumbnail.thumbnails[0]
+            const duration = audioResource.metadata.info.length.simpleText
 
             if (this.message.guild) App.logger.send(LogTypeEnum.PLAY_MUSIC, `Playing ${title} in ${this.message.guild.name}`)
             else App.logger.send(LogTypeEnum.PLAY_MUSIC, `Playing ${title} in DM`)
 
-            let embed = new Embeds({
+            const embed = new Embeds({
+                title: '🎵 Now playing ',
                 hexColor: ColorsEnum.GREEN,
-                description: `Now playing ${title}`,
+                description: `${title} **${duration}**`
             })
+
+            if (image) embed.options.image = image.url
 
             if (this.message && this.message instanceof Message) await this.message.edit({ embeds: [embed.build()] })
             else if (this.message) await this.message.editReply({ embeds: [embed.build()] })

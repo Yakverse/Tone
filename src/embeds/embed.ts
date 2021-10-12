@@ -22,6 +22,9 @@ export class Embeds{
         if (!options.description) options.description = undefined
         if (!options.user) options.user = undefined
         if (!options.hexColor) options.hexColor = undefined
+        if (!options.image) options.image = undefined
+        if (!options.thumbnail) options.thumbnail = undefined
+        if (!options.footer) options.footer = undefined
     }
 
     setDescription(text: string){
@@ -45,6 +48,15 @@ export class Embeds{
 
         if (this.options.description)
             embed.setDescription(this.options.description);
+
+        if (this.options.image)
+            embed.setImage(this.options.image)
+
+        if (this.options.thumbnail)
+            embed.setThumbnail(this.options.thumbnail)
+
+        if (this.options.footer)
+            embed.setFooter(this.options.footer)
 
         this.fields.forEach(field => {
             embed.addField(field.title, field.text, field.inline);

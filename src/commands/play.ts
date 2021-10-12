@@ -3,10 +3,8 @@ import { Command } from "./command";
 import MusicCommand from "./musicCommand";
 import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
-import App from "../main";
-import { LogTypeEnum } from "../enumerations/logType.enum";
+import MusicSearch from "../music/musicSearch";
 import {SearchInfoDTO} from "../dto/SearchInfoDTO";
-const youtubesearchapi = require('youtube-search-api');
 
 export default class Play extends MusicCommand implements Command {
 
@@ -51,26 +49,24 @@ export default class Play extends MusicCommand implements Command {
             await message.reply({embeds: [embed.build()]})
         }
 
-        // TODO fix bug where bot cant parse a video that is age restricted this try catch was made so the bot doesnt crash
-        try {
-            const info: SearchInfoDTO = (await youtubesearchapi.GetListByKeyword(url[0], false)).items[0]
+        const info: SearchInfoDTO = await MusicSearch.search(url[0])
 
-            let embed = new Embeds({
-                hexColor: ColorsEnum.GRAY,
-                description: `${info.title} Added to queue`,
-            })
+        let embed = new Embeds({
+            hexColor: ColorsEnum.WHITE,
+            title: `🎶 Added to queue`,
+            description: `${info.title}`,
+        })
+        if (info.thumbnail.thumbnails[0]) {
+            embed.options.thumbnail = info.thumbnail.thumbnails[0].url
+        }
 
-            if (!(message instanceof CommandInteraction)){
-                await message.edit({embeds:[embed.build()]})
-                await this.musicController.addQueue(message.guildId!, info, message)
-            }
-            else{
-                await message.editReply({embeds:[embed.build()]})
-                await this.musicController.addQueue(message.guildId!, info, null)
-            }
-        } catch (e : unknown){
-            App.logger.send(LogTypeEnum.ERROR, "Bot failed to parse, probably it is and adult video");
-            await message.reply("Something went very wrong")
+        if (!(message instanceof CommandInteraction)) {
+            await message.edit({embeds:[embed.build()]})
+            await this.musicController.addQueue(message.guildId!, info, message)
+        }
+        else {
+            await message.editReply({embeds:[embed.build()]})
+            await this.musicController.addQueue(message.guildId!, info, null)
         }
     }
 }
