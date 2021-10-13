@@ -3,5 +3,6 @@ export const environment = {
     prefix: '',
     log: '',
     newRelicKey: '',
-    inviteURL: ''
+    inviteURL: '',
+    cookie: ''
 }

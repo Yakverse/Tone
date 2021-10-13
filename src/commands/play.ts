@@ -54,7 +54,7 @@ export default class Play extends MusicCommand implements Command {
                 hexColor: ColorsEnum.RED,
                 title: `${error.name}`
             })
-
+            
             if (!(message instanceof CommandInteraction)) 
                 await message.edit({embeds:[embed.build()]})
             else 
@@ -67,9 +67,7 @@ export default class Play extends MusicCommand implements Command {
             title: `🎶 Added to queue`,
             description: `${info.title}`,
         })
-        if (info.thumbnail.thumbnails[0]) {
-            embed.options.thumbnail = info.thumbnail.thumbnails[0].url
-        }
+        embed.options.thumbnail = info.thumbnail
 
         if (!(message instanceof CommandInteraction)) {
             await message.edit({embeds:[embed.build()]})

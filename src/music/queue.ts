@@ -122,8 +122,8 @@ export default class Queue {
             this.audioPlayer.play(audioResource)
 
             const title = audioResource.metadata.info.title
-            const image = audioResource.metadata.info.thumbnail.thumbnails[0]
-            const duration = audioResource.metadata.info.length.simpleText
+            const image = audioResource.metadata.info.thumbnail
+            const duration = audioResource.metadata.info.length
 
             if (this.message.guild) App.logger.send(LogTypeEnum.PLAY_MUSIC, `Playing ${title} in ${this.message.guild.name}`)
             else App.logger.send(LogTypeEnum.PLAY_MUSIC, `Playing ${title} in DM`)
@@ -131,10 +131,9 @@ export default class Queue {
             const embed = new Embeds({
                 title: '🎵 Now playing ',
                 hexColor: ColorsEnum.GREEN,
-                description: `${title} **${duration}**`
+                description: `${title} - **${duration}**`
             })
-
-            if (image) embed.options.image = image.url
+            embed.options.image = image
 
             if (this.message && this.message instanceof Message) await this.message.edit({ embeds: [embed.build()] })
             else if (this.message) await this.message.editReply({ embeds: [embed.build()] })
