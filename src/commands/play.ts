@@ -49,7 +49,18 @@ export default class Play extends MusicCommand implements Command {
             await message.reply({embeds: [embed.build()]})
         }
 
-        const info: SearchInfoDTO = await MusicSearch.search(url[0])
+        const info: SearchInfoDTO | void = await MusicSearch.search(url[0]).catch(async error => {
+            let embed = new Embeds({
+                hexColor: ColorsEnum.RED,
+                title: `${error.name}`
+            })
+
+            if (!(message instanceof CommandInteraction)) 
+                await message.edit({embeds:[embed.build()]})
+            else 
+                await message.editReply({embeds:[embed.build()]})
+        })
+        if (!info) return
 
         let embed = new Embeds({
             hexColor: ColorsEnum.WHITE,
