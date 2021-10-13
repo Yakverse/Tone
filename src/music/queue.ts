@@ -140,7 +140,18 @@ export default class Queue {
             else if (this.message) await this.message.editReply({ embeds: [embed.build()] })
         }
         catch (e) {
+            const embed = new Embeds({
+                title: 'Error loading music',
+                hexColor: ColorsEnum.RED,
+                description: 'This song is probably age restricted'
+            })
+
+            if (this.message && this.message instanceof Message) await this.message.edit({ embeds: [embed.build()] })
+            else if (this.message) await this.message.editReply({ embeds: [embed.build()] })
+
             App.logger.send(LogTypeEnum.ERROR, `${e}`)
+
+            this.processQueue()
         }
     }
 }
