@@ -50,7 +50,6 @@ export default class MusicSearch{
         }
         else {
             const searchDTO = await youtubesearchapi.GetListByKeyword(query, false)
-            if (searchDTO.items.length === 0) throw new NoMusicFound()
             for (let i = 0; i < searchDTO.items.length; i++){
                 if (searchDTO.items[i].type === 'video'){
                     let item = searchDTO.items[i]
@@ -64,9 +63,9 @@ export default class MusicSearch{
                     }
                 }
             }
-            throw new NoMusicFound()
         }
 
+        throw new NoMusicFound()
 
     }
 }
