@@ -21,7 +21,7 @@ export default class Audio {
                     stream = await scdl.downloadFormat(this.info.url, scdl.FORMATS.OPUS)
 
                 } else {
-                    let url: string = `https://www.youtube.com/watch?v=${this.info.id}`
+                    let url: string = this.info.url
                     streamType = StreamType.Opus;
                     stream = await ytdl(url, {
                         quality: 'highestaudio',

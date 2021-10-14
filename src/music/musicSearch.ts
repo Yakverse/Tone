@@ -54,13 +54,10 @@ export default class MusicSearch{
             for (let i = 0; i < searchDTO.items.length; i++){
                 if (searchDTO.items[i].type === 'video'){
                     let item = searchDTO.items[i]
-
-                    console.log(item.thumbanil.thumbnails)
-
                     return {
                         id: item.id,
                         type: item.type,
-                        url: query,
+                        url: `https://www.youtube.com/watch?v=${item.id}`,
                         thumbnail: item.thumbnail.thumbnails[0].url,
                         title: item.title,
                         length: item.length.simpleText
