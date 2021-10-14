@@ -5,6 +5,8 @@ import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import MusicSearch from "../music/musicSearch";
 import {SearchInfoDTO} from "../dto/SearchInfoDTO";
+import App from "../main";
+import {LogTypeEnum} from "../enumerations/logType.enum";
 
 export default class Play extends MusicCommand implements Command {
 
@@ -52,9 +54,11 @@ export default class Play extends MusicCommand implements Command {
         const info: SearchInfoDTO | void = await MusicSearch.search(url[0]).catch(async error => {
             let embed = new Embeds({
                 hexColor: ColorsEnum.RED,
-                title: `${error.name}`
+                title: `Error`,
+                description: 'This song is probably age restricted'
             })
-            
+
+            App.logger.send(LogTypeEnum.ERROR, `${error}`)
             if (!(message instanceof CommandInteraction)) 
                 await message.edit({embeds:[embed.build()]})
             else 
