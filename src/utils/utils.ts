@@ -14,7 +14,7 @@ export default class Utils{
     static parseSecondsToISO(lenghtSeconds: number): string{
         let seconds = (lenghtSeconds % 60).toString();
         seconds = seconds.length > 1 ? seconds.toString() : "0" + seconds.toString();
-        let minutes = lenghtSeconds/60>>0%60;
+        let minutes = (lenghtSeconds/60>>0)%60;
         let hours = lenghtSeconds/3600>>0;
         let response = "";
 
@@ -29,8 +29,8 @@ export default class Utils{
         let ISOArr = ISO.split(":");
         let multi = 1;
         let total = 0;
-        for (const isoArrKey in ISOArr) {
-            total += parseInt(isoArrKey)*multi;
+        for (let i = ISOArr.length-1; i >= 0 ; i--){
+            total += parseInt(ISOArr[i])*multi;
             multi *= 60;
         }
         return total;
