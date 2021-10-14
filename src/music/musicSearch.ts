@@ -58,7 +58,7 @@ export default class MusicSearch{
                         id: item.id,
                         type: item.type,
                         url: `https://www.youtube.com/watch?v=${item.id}`,
-                        thumbnail: item.thumbnail.thumbnails[0].url,
+                        thumbnail: item.thumbnail.thumbnails[item.thumbnail.thumbnails.length - 1].url,
                         title: item.title,
                         length: item.length.simpleText
                     }
