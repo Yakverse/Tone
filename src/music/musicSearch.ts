@@ -1,5 +1,7 @@
 import {SearchInfoDTO} from "../dto/SearchInfoDTO";
 import NoMusicFound from "../errors/NoMusicFound";
+import ytdl from 'ytdl-core';
+import Utils from "../utils/utils";
 const youtubesearchapi = require('youtube-search-api');
 const scdl = require('soundcloud-downloader').default;
 
@@ -23,7 +25,6 @@ export default class MusicSearch{
 
         let time = new Date(info.duration).toISOString().slice(11, -5)
         if (time.slice(0, 2) == '00') time = time.slice(3)
-        else time = time
         
         return {
             id: info.id as string,
@@ -36,20 +37,39 @@ export default class MusicSearch{
     }
 
     private static async youtubeSearch(query: string): Promise<SearchInfoDTO>{
-        const searchDTO = await youtubesearchapi.GetListByKeyword(query, false)
-        for (let i = 0; i < searchDTO.items.length; i++){
-            if (searchDTO.items[i].type === 'video'){
-                let item = searchDTO.items[i]
-                return {
-                    id: item.id,
-                    type: item.type,
-                    url: query,
-                    thumbnail: item.thumbnail.thumbnails[0].url,
-                    title: item.title,
-                    length: item.length.simpleText
-                }
+        if (ytdl.validateURL(query)){
+            const res = await ytdl.getBasicInfo(query)
+            return {
+                id: res.videoDetails.videoId,
+                type: 'video',
+                url: res.videoDetails.video_url,
+                thumbnail: res.videoDetails.thumbnails[res.videoDetails.thumbnails.length - 1].url,
+                title: res.videoDetails.title,
+                length: Utils.parseSecondsToISO(parseInt(res.videoDetails.lengthSeconds))
             }
         }
-        throw new NoMusicFound()
+        else {
+            const searchDTO = await youtubesearchapi.GetListByKeyword(query, false)
+            if (searchDTO.items.length === 0) throw new NoMusicFound()
+            for (let i = 0; i < searchDTO.items.length; i++){
+                if (searchDTO.items[i].type === 'video'){
+                    let item = searchDTO.items[i]
+
+                    console.log(item.thumbanil.thumbnails)
+
+                    return {
+                        id: item.id,
+                        type: item.type,
+                        url: query,
+                        thumbnail: item.thumbnail.thumbnails[0].url,
+                        title: item.title,
+                        length: item.length.simpleText
+                    }
+                }
+            }
+            throw new NoMusicFound()
+        }
+
+
     }
 }
