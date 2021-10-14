@@ -9,10 +9,11 @@ import MusicAlreadyPlaying from "../errors/MusicAlreadyPlaying";
 import App from "../main";
 import { LogTypeEnum } from "../enumerations/logType.enum";
 import BotIsProcessingError from "../errors/BotIsProcessingError";
+import Utils from "../utils/utils";
 
 export default class Queue {
     // Nome - Duração
-    audiosInfo: Array<[string, number]> = new Array<[string, number]>();
+    audiosInfo: Array<[string, string]> = new Array<[string, string]>();
     queueTime: number = 0;
     audios: Array<Audio> = new Array<Audio>();
     audioPlayer: AudioPlayer = createAudioPlayer();
@@ -32,12 +33,12 @@ export default class Queue {
     }
 
     addAudio(audio: Audio){
-        // let time = parseInt(audio.info.length.simpleText);
-        // let title = audio.info.title;
-        //
-        // this.queueTime += time;
-        // this.length +=1;
-        // this.audiosInfo.push([title, time]);
+        let time = audio.info.length;
+        let title = audio.info.title;
+
+        this.queueTime += Utils.parseISOToSeconds(time);
+        this.length +=1;
+        this.audiosInfo.push([title, time]);
         this.audios.push(audio);
     }
 

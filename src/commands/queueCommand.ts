@@ -56,13 +56,13 @@ export default class QueueCommand extends MusicCommand implements Command {
         // Body
         let text: string = "```";
         for ( let i = 0; i < nMusicInCurrPage; i++) {
-            let musInfo: [string,number] = currQueue.audiosInfo[currPage*this.MUSICS_PER_PAGE+i];
+            let musInfo: [string, string] = currQueue.audiosInfo[currPage*this.MUSICS_PER_PAGE+i];
             if(i == currindex%this.MUSICS_PER_PAGE && isCurrentMusicInCurrentPage ){
                 text += `${STRING_PADDING}⬐ current track\n`;
-                text += `${(currPage*this.MUSICS_PER_PAGE+i+1).toString()}. ${Utils.formatString(musInfo[0])} - ${Utils.parseSecondsToISO(musInfo[1])}\n`;
+                text += `${(currPage*this.MUSICS_PER_PAGE+i+1).toString()}. ${Utils.formatString(musInfo[0])} - ${musInfo[1]}\n`;
                 text += `${STRING_PADDING}⬑ current track\n`;
             } else {
-                text += `${(currPage*this.MUSICS_PER_PAGE+i+1).toString()}. ${Utils.formatString(musInfo[0])} - ${Utils.parseSecondsToISO(musInfo[1])}\n`;
+                text += `${(currPage*this.MUSICS_PER_PAGE+i+1).toString()}. ${Utils.formatString(musInfo[0])} - ${musInfo[1]}\n`;
             }
         }
         // Fotter
