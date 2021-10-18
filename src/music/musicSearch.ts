@@ -4,6 +4,7 @@ import ytdl from 'ytdl-core';
 import Utils from "../utils/utils";
 import { VideoTypes } from "../enumerations/videoType.enum";
 import PlaylistLimit from "../errors/PlaylistLimit";
+import { environment } from "../environments/environment";
 const youtubesearchapi = require('youtube-search-api');
 const scdl = require('soundcloud-downloader').default;
 const ytfps = require('@maroxy/ytfps');
@@ -71,7 +72,7 @@ export default class MusicSearch {
                 }
             } else if (item.type === VideoTypes.YOUTUBE_PLAYLIST) {
 
-                if (searchDTO.items[0].videoCount > 1000) 
+                if (searchDTO.items[0].videoCount > environment.playlistLimit) 
                     throw new PlaylistLimit()
 
                 let playlist = await ytfps(searchDTO.items[0].id)
