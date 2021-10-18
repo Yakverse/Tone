@@ -1,11 +1,14 @@
-import {SearchInfoDTO} from "../dto/SearchInfoDTO";
+import { SearchInfoDTO, VideoInfo } from "../dto/SearchInfoDTO";
 import NoMusicFound from "../errors/NoMusicFound";
 import ytdl from 'ytdl-core';
 import Utils from "../utils/utils";
+import { VideoTypes } from "../enumerations/videoType.enum";
+import PlaylistLimit from "../errors/PlaylistLimit";
 const youtubesearchapi = require('youtube-search-api');
 const scdl = require('soundcloud-downloader').default;
+const ytfps = require('@maroxy/ytfps');
 
-export default class MusicSearch{
+export default class MusicSearch {
 
     static async search(query: string): Promise<SearchInfoDTO>{
         const soundCloudRegex = /(snd\.sc|soundcloud\.com)/
@@ -28,11 +31,12 @@ export default class MusicSearch{
         
         return {
             id: info.id as string,
-            type: 'soundcloud',
+            type: VideoTypes.SOUNDCLOUD,
             url: query,
             thumbnail: info.artwork_url as string,
             title: info.title as string,
-            length: time
+            length: time,
+            videos: undefined
         }
     }
 
@@ -41,31 +45,60 @@ export default class MusicSearch{
             const res = await ytdl.getBasicInfo(query)
             return {
                 id: res.videoDetails.videoId,
-                type: 'video',
+                type: VideoTypes.YOUTUBE_VIDEO,
                 url: res.videoDetails.video_url,
                 thumbnail: res.videoDetails.thumbnails[res.videoDetails.thumbnails.length - 1].url,
                 title: res.videoDetails.title,
-                length: Utils.parseSecondsToISO(parseInt(res.videoDetails.lengthSeconds))
+                length: Utils.parseSecondsToISO(parseInt(res.videoDetails.lengthSeconds)),
+                videos: undefined
             }
         }
         else {
-            const searchDTO = await youtubesearchapi.GetListByKeyword(query, false)
-            for (let i = 0; i < searchDTO.items.length; i++){
-                if (searchDTO.items[i].type === 'video'){
-                    let item = searchDTO.items[i]
-                    return {
+            let searchDTO = await youtubesearchapi.GetListByKeyword(query, true)
+            if (searchDTO.items.length == 0) 
+                throw new NoMusicFound()
+
+            let item = searchDTO.items[0]
+            if (item.type === VideoTypes.YOUTUBE_VIDEO) {
+                return {
+                    id: item.id,
+                    type: VideoTypes.YOUTUBE_VIDEO,
+                    url: `https://www.youtube.com/watch?v=${item.id}`,
+                    thumbnail: item.thumbnail.thumbnails[item.thumbnail.thumbnails.length - 1].url,
+                    title: item.title,
+                    length: item.length.simpleText,
+                    videos: undefined
+                }
+            } else if (item.type === VideoTypes.YOUTUBE_PLAYLIST) {
+
+                if (searchDTO.items[0].videoCount > 1000) 
+                    throw new PlaylistLimit()
+
+                let playlist = await ytfps(searchDTO.items[0].id)
+                let videos: VideoInfo[] = []
+                
+                for (let item of playlist.videos){
+                    videos.push({
                         id: item.id,
-                        type: item.type,
+                        type: VideoTypes.YOUTUBE_VIDEO,
                         url: `https://www.youtube.com/watch?v=${item.id}`,
-                        thumbnail: item.thumbnail.thumbnails[item.thumbnail.thumbnails.length - 1].url,
+                        thumbnail: item.thumbnail_url,
                         title: item.title,
-                        length: item.length.simpleText
-                    }
+                        length: item.length
+                    })
+                }
+
+                return {
+                    id: playlist.id,
+                    type: VideoTypes.YOUTUBE_PLAYLIST,
+                    url: playlist.url,
+                    thumbnail: playlist.thumbnail_url,
+                    title: playlist.title,
+                    length: playlist.videos.length,
+                    videos: videos
                 }
             }
         }
-
         throw new NoMusicFound()
-
     }
 }

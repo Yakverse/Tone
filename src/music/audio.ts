@@ -1,6 +1,6 @@
 import { AudioResource, createAudioResource, StreamType } from "@discordjs/voice";
 import ytdl from 'ytdl-core-discord';
-import {SearchInfoDTO} from "../dto/SearchInfoDTO";
+import { VideoInfo } from "../dto/SearchInfoDTO";
 import { LogTypeEnum } from "../enumerations/logType.enum";
 import { environment } from "../environments/environment";
 import App from "../main";
@@ -8,7 +8,7 @@ const scdl = require('soundcloud-downloader').default;
 
 export default class Audio {
 
-    constructor(public info: SearchInfoDTO) {}
+    constructor(public info: VideoInfo) {}
 
     async createAudio(): Promise<AudioResource<Audio>>{
         return new Promise(async (resolve, reject) => {

@@ -8,6 +8,7 @@ import UserInWrongChannel from "../errors/userInWrongChannel";
 import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import {SearchInfoDTO} from "../dto/SearchInfoDTO";
+import { VideoTypes } from "../enumerations/videoType.enum";
 
 export default class MusicController {
 
@@ -65,8 +66,13 @@ export default class MusicController {
         if (message)
             queue.updateMessage(message);
 
-        queue.addAudio(new Audio(videoInfo));
-        await queue.processQueue();
+        if (videoInfo.type === VideoTypes.YOUTUBE_VIDEO || videoInfo.type === VideoTypes.SOUNDCLOUD)
+            queue.addAudio(new Audio(videoInfo));
+        else // For now it's not necessary to check if it's a playlist.
+            for (let video of videoInfo.videos!)
+                queue.addAudio(new Audio(video));
+
+        await queue.processQueue(true);
     }
 
     loop(message: Message | CommandInteraction, number: number | undefined){

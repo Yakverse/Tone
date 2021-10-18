@@ -4,9 +4,9 @@ import MusicCommand from "./musicCommand";
 import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import MusicSearch from "../music/musicSearch";
-import {SearchInfoDTO} from "../dto/SearchInfoDTO";
 import App from "../main";
 import {LogTypeEnum} from "../enumerations/logType.enum";
+import { VideoTypes } from "../enumerations/videoType.enum";
 
 export default class Play extends MusicCommand implements Command {
 
@@ -51,13 +51,13 @@ export default class Play extends MusicCommand implements Command {
             await message.reply({embeds: [embed.build()]})
         }
 
-        const info: SearchInfoDTO | void = await MusicSearch.search(url[0]).catch(async error => {
+        const info = await MusicSearch.search(url[0]).catch(async error => {
             let embed = new Embeds({
                 hexColor: ColorsEnum.RED,
                 title: `Error`,
-                description: 'This song is probably age restricted'
+                description: error.name
             })
-
+            console.log(error)
             App.logger.send(LogTypeEnum.ERROR, `${error}`)
             if (!(message instanceof CommandInteraction)) 
                 await message.edit({embeds:[embed.build()]})
@@ -66,12 +66,22 @@ export default class Play extends MusicCommand implements Command {
         })
         if (!info) return
 
-        let embed = new Embeds({
-            hexColor: ColorsEnum.WHITE,
-            title: `🎶 Added to queue`,
-            description: `${info.title}`,
-        })
-        embed.options.thumbnail = info.thumbnail
+        let embed
+        if (info.type === VideoTypes.YOUTUBE_VIDEO || info.type === VideoTypes.SOUNDCLOUD){
+            embed = new Embeds({
+                hexColor: ColorsEnum.WHITE,
+                title: `🎶 Added to queue`,
+                description: `${info.title}`
+            })
+            embed.options.thumbnail = info.thumbnail
+        } else { // For now it's not necessary to check if it's a playlist.
+            embed = new Embeds({
+                hexColor: ColorsEnum.WHITE,
+                title: `🎶 Added ${info.length} songs queue`,
+                description: `${info.title}`,
+            })
+            embed.options.thumbnail = info.thumbnail
+        }
 
         if (!(message instanceof CommandInteraction)) {
             await message.edit({embeds:[embed.build()]})

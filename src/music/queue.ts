@@ -85,13 +85,12 @@ export default class Queue {
     }
 
     skip(){
-        if(this.audios.length == 0){
+        if(this.audios.length == 0)
             throw new NoTracksToSkip();
-        }
 
-        if(this.audioPlayer.state.status === AudioPlayerStatus.Idle){
+        if(this.audioPlayer.state.status === AudioPlayerStatus.Idle)
             throw new BotIsProcessingError();
-        }
+
         this.audioPlayer.stop();
         this.actualAudio = undefined;
     }
@@ -101,7 +100,7 @@ export default class Queue {
         this.clearAudios()
     }
 
-    async processQueue(){
+    async processQueue(playlist: boolean = false){
         if (this.audioPlayer.state.status !== AudioPlayerStatus.Idle) return
 
         if (this.audios.length === this.indexActualAudio + 1){
@@ -114,7 +113,7 @@ export default class Queue {
                 App.InactivityHandler.createNoMusicTimeout(this.message.guild!.id, this)
                 return
             }
-        } else this.indexActualAudio++
+        } else if (!playlist) this.indexActualAudio++
 
         try {
             this.actualAudio = this.audios[this.indexActualAudio]
