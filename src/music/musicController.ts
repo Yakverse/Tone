@@ -12,56 +12,56 @@ import { VideoTypes } from "../enumerations/videoType.enum";
 
 export default class MusicController {
 
-    static guilds: Map<string, Queue> = new Map<string, Queue>();
+    guilds: Map<string, Queue> = new Map<string, Queue>();
 
-    static getQueue(guildId: string): Queue{
-        const queue: Queue | undefined = MusicController.guilds.get(guildId)
+    getQueue(guildId: string): Queue{
+        const queue: Queue | undefined = this.guilds.get(guildId)
         if (queue) return queue;
         throw new BotNotInAVoiceChannel();
     }
 
     configGuildQueue(voiceConnection: VoiceConnection, guildId: string, message: Message | CommandInteraction){
 
-        let queue: Queue | undefined = MusicController.guilds.get(guildId)
-        if (!queue) queue = MusicController.guilds.set(guildId, new Queue(voiceConnection, message)).get(guildId)
+        let queue: Queue | undefined = this.guilds.get(guildId)
+        if (!queue) queue = this.guilds.set(guildId, new Queue(voiceConnection, message)).get(guildId)
 
         queue!.addListener()
     }
     
     pause(message: Message | CommandInteraction){
-        MusicController.isInSameVoiceChannel(message)
-        MusicController.getQueue(message.guildId!).pause();
+        this.isInSameVoiceChannel(message)
+        this.getQueue(message.guildId!).pause();
     }
 
     resume(message: Message | CommandInteraction){
-        MusicController.isInSameVoiceChannel(message)
-        MusicController.getQueue(message.guildId!).resume();
+        this.isInSameVoiceChannel(message)
+        this.getQueue(message.guildId!).resume();
     }
 
     // TODO remove leave from MusicController
     leave(message: Message | CommandInteraction | null, guildId: string | undefined = undefined){
         if (message) {
-            MusicController.isInSameVoiceChannel(message)
-            MusicController.getQueue(message.guildId!).leave();
-            MusicController.guilds.delete(message.guildId!);
+            this.isInSameVoiceChannel(message)
+            this.getQueue(message.guildId!).leave();
+            this.guilds.delete(message.guildId!);
         } else if (guildId) {
-            MusicController.getQueue(guildId).leave();
-            MusicController.guilds.delete(guildId);
+            this.getQueue(guildId).leave();
+            this.guilds.delete(guildId);
         }
     }
 
     stop(message: Message | CommandInteraction){
-        MusicController.isInSameVoiceChannel(message)
-        MusicController.getQueue(message.guildId!).stop()
+        this.isInSameVoiceChannel(message)
+        this.getQueue(message.guildId!).stop()
     }
 
     skip(message: Message | CommandInteraction){
-        MusicController.isInSameVoiceChannel(message)
-        MusicController.getQueue(message.guildId!).skip()
+        this.isInSameVoiceChannel(message)
+        this.getQueue(message.guildId!).skip()
     }
 
     async addQueue(guildId: string, videoInfo: SearchInfoDTO, message: Message | null){
-        const queue: Queue = MusicController.getQueue(guildId)
+        const queue: Queue = this.getQueue(guildId)
 
         if (message)
             queue.updateMessage(message);
@@ -76,15 +76,15 @@ export default class MusicController {
     }
 
     loop(message: Message | CommandInteraction, number: number | undefined){
-        MusicController.isInSameVoiceChannel(message)
-        const queue: Queue = MusicController.getQueue(message.guildId!)
+        this.isInSameVoiceChannel(message)
+        const queue: Queue = this.getQueue(message.guildId!)
         if (!queue.actualAudio) return
         queue.loop(number)
     }
 
     unloop(message: Message | CommandInteraction){
-        MusicController.isInSameVoiceChannel(message);
-        const queue: Queue = MusicController.getQueue(message.guildId!)
+        this.isInSameVoiceChannel(message);
+        const queue: Queue = this.getQueue(message.guildId!)
         if (!queue.actualAudio) return
         queue.unloop()
     }
@@ -92,7 +92,7 @@ export default class MusicController {
     join(message: Message | CommandInteraction){
         if (message.member instanceof GuildMember && message.member.voice.channel) {
             const channel = message.member.voice.channel
-            const track: Queue | undefined = MusicController.guilds.get(channel.guildId)
+            const track: Queue | undefined = this.guilds.get(channel.guildId)
             if (track) {
                 if (track.voiceConnection.joinConfig.channelId != channel.id) {
                     let embed = new Embeds({
@@ -124,8 +124,8 @@ export default class MusicController {
         }
     }
 
-    public static isInSameVoiceChannel(message: Message | CommandInteraction | ButtonInteraction): void{
-        let track: Queue | undefined = MusicController.guilds.get(message.guildId!);
+    public isInSameVoiceChannel(message: Message | CommandInteraction | ButtonInteraction): void{
+        let track: Queue | undefined = this.guilds.get(message.guildId!);
 
         if (!(message.member instanceof GuildMember)){
             // Not in a guild chat

@@ -3,7 +3,6 @@ import {Command} from "./command";
 import Queue from "../music/queue";
 import MusicCommand from "./musicCommand";
 import Utils from "../utils/utils";
-import MusicController from "../music/musicController";
 import BotNotInAVoiceChannel from "../errors/botNotInAVoiceChannel";
 import NoTracksInQueue from "../errors/NoTracksInQueue";
 
@@ -17,7 +16,7 @@ export default class QueueCommand extends MusicCommand implements Command {
     execute(message: Message | CommandInteraction | ButtonInteraction): void{
         if (message.member instanceof GuildMember && message.member.voice.channel) {
             const guildId: string = message.member.guild.id;
-            let currQueue: Queue | undefined = MusicController.guilds.get(guildId);
+            let currQueue: Queue | undefined = this.musicController.guilds.get(guildId);
             if (currQueue){
                 if(!currQueue.length){
                     throw new NoTracksInQueue;
@@ -66,7 +65,7 @@ export default class QueueCommand extends MusicCommand implements Command {
             }
         }
         // Fotter
-        text += `\n${currQueue.length} song${currQueue.length != 1 ? "s" : ""} in queue | ${Utils.parseSecondsToISO(currQueue.queueTime)} total length | Loop: ${currQueue.timesToPlay <= 1 ? "❌" : "✔"} | Page ${currPage+1}/${lastPage+1}`;
+        text += `\n${currQueue.length} Song${currQueue.length != 1 ? "s" : ""} In Queue | ${Utils.parseSecondsToISO(currQueue.queueTime)} Total Length | Loop: ${currQueue.timesToPlay <= 1 ? "❌" : "✔"} | Page ${currPage+1}/${lastPage+1}`;
         text += "```";
         return text
     }

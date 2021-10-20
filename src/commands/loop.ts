@@ -1,7 +1,6 @@
 import {Command} from "./command";
 import {CommandInteraction, GuildMember, Message} from "discord.js";
 import MusicCommand from "./musicCommand";
-import MusicController from "../music/musicController";
 import SucessEmbed from "../embeds/sucessEmbed";
 
 export default class Loop extends MusicCommand implements Command {
@@ -12,7 +11,7 @@ export default class Loop extends MusicCommand implements Command {
 
     execute(message: Message | CommandInteraction, args: Array<string>) {
         if(message.member instanceof GuildMember){
-            MusicController.isInSameVoiceChannel(message);
+            this.musicController.isInSameVoiceChannel(message);
             if (message instanceof Message) {
                 if (parseInt(args[0])) this.musicController.loop(message, parseInt(args[0]));
                 else this.musicController.loop(message, undefined);
