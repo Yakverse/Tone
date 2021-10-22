@@ -58,7 +58,7 @@ export class Event {
     onGuildRemove(guildName: string, numberGuilds: number){ App.logger.send(LogTypeEnum.REMOVE_GUILD, `Removed from guild: ${guildName} - Total servers: ${numberGuilds}`) }
 
     onVoiceStateUpdate(oldState: VoiceState, newState: VoiceState) {
-        // if (newState.guild.me && oldState.id == newState.guild.me.id && !newState.channelId) App.musicController.leave(null, oldState.guild.id)
+        if (newState.guild.me && oldState.id == newState.guild.me.id && !newState.channelId) App.musicController.leaveAssert(oldState.guild.id)
         if (!oldState.channel || !oldState.guild.me || !newState.guild.me) return
 
         if (newState.channelId === newState.guild.me.voice.channelId)

@@ -20,6 +20,12 @@ export default class MusicController {
         throw new BotNotInAVoiceChannel();
     }
 
+    getOptionalQueue(guildId: string): Queue | undefined{
+        const queue: Queue | undefined = this.guilds.get(guildId)
+        if (queue) return queue;
+        return undefined
+    }
+
     configGuildQueue(voiceConnection: VoiceConnection, guildId: string, message: Message | CommandInteraction){
 
         let queue: Queue | undefined = this.guilds.get(guildId)
@@ -48,6 +54,12 @@ export default class MusicController {
             this.getQueue(guildId).leave();
             this.guilds.delete(guildId);
         }
+    }
+
+    leaveAssert(guildId: string){
+        const queue = this.getOptionalQueue(guildId)
+        if (queue) queue.leave()
+        this.guilds.delete(guildId);
     }
 
     stop(message: Message | CommandInteraction){
