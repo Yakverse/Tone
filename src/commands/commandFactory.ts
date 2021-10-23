@@ -8,14 +8,11 @@ export class CommandFactory {
         switch (command) {
             case 'ping':
                 return new commands.Ping()
-            case 'play':
-            case 'p':
+            case 'play' || 'p':
                 return new commands.Play()
-            case 'leave':
-            case 'l':
+            case 'leave' || 'l':
                 return new commands.Leave()
-            case 'skip':
-            case 's':
+            case 'skip' || 's':
                 return new commands.Skip()
             case 'pause':
                 return new commands.Pause()
@@ -27,14 +24,13 @@ export class CommandFactory {
                 return new commands.Loop()
             case 'unloop':
                 return new commands.Unloop()
-            case 'help':
+            case 'help' || 'h':
                 return new commands.Help()
-            case 'queue':
-            case 'q':
+            case 'queue' || 'q':
                 return new commands.Queue()
             case 'invite':
                 return new commands.Invite()
-            case 'join':
+            case 'join' || 'j':
                 return new commands.Join()
             default:
                 throw new InvalidCommand();
