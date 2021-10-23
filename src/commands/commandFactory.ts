@@ -9,10 +9,13 @@ export class CommandFactory {
             case 'ping':
                 return new commands.Ping()
             case 'play':
+            case 'p':
                 return new commands.Play()
             case 'leave':
+            case 'l':
                 return new commands.Leave()
             case 'skip':
+            case 's':
                 return new commands.Skip()
             case 'pause':
                 return new commands.Pause()
@@ -27,6 +30,7 @@ export class CommandFactory {
             case 'help':
                 return new commands.Help()
             case 'queue':
+            case 'q':
                 return new commands.Queue()
             case 'invite':
                 return new commands.Invite()
