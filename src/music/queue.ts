@@ -42,7 +42,7 @@ export default class Queue {
         this.audios.push(audio);
     }
 
-    updateMessage(message: Message){
+    updateMessage(message: Message | CommandInteraction){
         this.message = message;
     }
 
