@@ -69,9 +69,7 @@ export default class MusicController {
 
     skip(message: Message | CommandInteraction){
         this.isInSameVoiceChannel(message)
-        let queue = this.getQueue(message.guildId!)
-        queue.skip();
-        queue.updateMessage(message);
+        this.getQueue(message.guildId!).skip()
     }
 
     async addQueue(guildId: string, videoInfo: SearchInfoDTO, message: Message | null){

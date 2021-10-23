@@ -7,6 +7,8 @@ import App from "../main";
 import { LogTypeEnum } from "../enumerations/logType.enum";
 import InvalidCommand from "../errors/invalidCommand";
 import { ButtonFactory } from "../commands/buttonFactory";
+import {Embeds} from "../embeds/embed";
+import {ColorsEnum} from "../enumerations/Colors.enum";
 
 export class Event {
 
@@ -58,7 +60,14 @@ export class Event {
     onGuildRemove(guildName: string, numberGuilds: number){ App.logger.send(LogTypeEnum.REMOVE_GUILD, `Removed from guild: ${guildName} - Total servers: ${numberGuilds}`) }
 
     onVoiceStateUpdate(oldState: VoiceState, newState: VoiceState) {
-        if (newState.guild.me && oldState.id == newState.guild.me.id && !newState.channelId) App.musicController.leaveAssert(oldState.guild.id)
+        if (newState.guild.me && oldState.id == newState.guild.me.id && !newState.channelId) {
+            let embed = new Embeds({
+                hexColor: ColorsEnum.RED,
+                description: `I have been kicked from the voice channel 🙁`,
+            })
+            App.musicController.getQueue(oldState.guild.id).message.channel!.send({embeds:[embed.build()]})
+            App.musicController.leaveAssert(oldState.guild.id)
+        }
         if (!oldState.channel || !oldState.guild.me || !newState.guild.me) return
 
         if (newState.channelId === newState.guild.me.voice.channelId)
