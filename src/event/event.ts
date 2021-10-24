@@ -65,7 +65,7 @@ export class Event {
                 hexColor: ColorsEnum.RED,
                 description: `I have been kicked from the voice channel 🙁`,
             })
-            App.musicController.getQueue(oldState.guild.id).message.channel!.send({embeds:[embed.build()]})
+            App.musicController.getOptionalQueue(oldState.guild.id)?.message.channel!.send({embeds:[embed.build()]})
             App.musicController.leaveAssert(oldState.guild.id)
         }
         if (!oldState.channel || !oldState.guild.me || !newState.guild.me) return
