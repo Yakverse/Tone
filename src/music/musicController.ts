@@ -102,6 +102,7 @@ export default class MusicController {
     }
 
     join(message: Message | CommandInteraction){
+        this.isInAVoiceChannel(message)
         if (message.member instanceof GuildMember && message.member.voice.channel) {
             const channel = message.member.voice.channel
             const track: Queue | undefined = this.guilds.get(channel.guildId)
@@ -126,14 +127,11 @@ export default class MusicController {
                     message
                 )
             }
-        } else {
-            let embed = new Embeds({
-                hexColor: ColorsEnum.RED,
-                description: '**You must be in a voice channel to use this command**',
-            })
-            message.reply({embeds: [embed.build()]})
-            return
         }
+    }
+
+    public isInAVoiceChannel(message: Message | CommandInteraction | ButtonInteraction){
+        if (!(message.member instanceof GuildMember) || !message.member.voice.channel) throw new UserNotInAVoiceChannel();
     }
 
     public isInSameVoiceChannel(message: Message | CommandInteraction | ButtonInteraction): void{
