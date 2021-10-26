@@ -5,10 +5,10 @@ import BotError from "../errors/botError";
 import { ErrorEmbed } from "../embeds/errorEmbed";
 import App from "../main";
 import { LogTypeEnum } from "../enumerations/logType.enum";
-import InvalidCommand from "../errors/invalidCommand";
 import { ButtonFactory } from "../commands/buttonFactory";
 import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
+import { Command } from "../commands/command";
 
 export class Event {
 
@@ -35,24 +35,54 @@ export class Event {
 
             args.shift()
 
-            try{ this.commandFactory.factory(command).execute(message, args) }
-            catch (e: unknown) {
-                this.handlerException(message, e)
-            }
+            this.factoryHandler(message, command, args)
         }
     }
 
     onInteraction(interaction: Interaction): void {
         try{
-            if (interaction.isCommand()){
-                this.commandFactory.factory(interaction.commandName).execute(interaction, null)
-            } else if (interaction.isButton()) {
+            if (interaction.isCommand())
+                this.factoryHandler(interaction, interaction.commandName, null)
+                
+            else if (interaction.isButton()) 
                 this.buttonFactory.factory(interaction.customId).execute(interaction, null)
-            } else {
+
+            else 
                 return;
-            }
+
         } catch (e) {
             this.handlerException(interaction, e);
+        }
+    }
+
+    factoryHandler(message: Message | CommandInteraction, command: string, args: Array<string> | null): void {
+        try{ 
+            let factory = this.commandFactory.factory(command)
+
+            if (typeof factory === "function"){
+                factory = factory as Command
+                if (!(message instanceof Interaction)) factory.execute(message, args)
+                else if (message instanceof Interaction) factory.execute(message, null)
+                
+            } else {
+                factory = factory as string[]
+
+                let description: string
+                if (factory.length > 1)
+                    description =  `The most similar commands are: \n${factory.join('\n')}`
+                else 
+                    description =  `The most similar command is: \n${factory.join('\n')}`
+
+                let embed = new Embeds({
+                    hexColor: ColorsEnum.BLUE,
+                    title: "Command not found",
+                    description: description,
+                })
+                message.reply({ embeds: [embed.build()] })
+            }
+        }
+        catch (e: unknown) {
+            this.handlerException(message, e)
         }
     }
 
@@ -79,9 +109,6 @@ export class Event {
     }
 
     private handlerException(message: Message | Interaction , exception: unknown): void {
-        let invalidCommandException = exception as InvalidCommand
-        App.logger.send(LogTypeEnum.ERROR, `${invalidCommandException.message}`);
-
         if (exception instanceof BotError){
             if(!(message instanceof Interaction))
                 message.reply({ embeds: [new ErrorEmbed(exception.message).build()] });
