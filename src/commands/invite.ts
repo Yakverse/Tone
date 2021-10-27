@@ -8,7 +8,6 @@ export default class Invite implements Command{
     static properties: CommandPropertiesInterface = {
         name: 'invite',
         description: 'invite me to your discord server',
-        options: [],
         aliases: ['invite']
     }
 

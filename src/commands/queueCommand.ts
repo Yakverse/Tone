@@ -9,10 +9,9 @@ import NoTracksInQueue from "../errors/NoTracksInQueue";
 export default class QueueCommand extends MusicCommand implements Command {
 
     static properties: CommandPropertiesInterface = {
-        name: 'Queue',
+        name: 'queue',
         description: 'Show the current music queue',
-        options: [],
-        aliases: ['q', 'queue']
+        aliases: [ 'q', 'queue' ]
     }
 
     MUSICS_PER_PAGE: number = 10;

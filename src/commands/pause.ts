@@ -8,7 +8,6 @@ export default class Pause extends MusicCommand implements Command {
     static properties: CommandPropertiesInterface = {
         name: 'pause',
         description: 'Pause the song',
-        options: [],
         aliases: ['pause']
     }
 

@@ -9,7 +9,6 @@ export default class Ping implements Command {
     static properties: CommandPropertiesInterface = {
         name: 'ping',
         description: 'Test ping',
-        options: [],
         aliases: ['ping']
     }
 

@@ -8,7 +8,6 @@ export default class Unloop extends MusicCommand implements Command {
     static properties: CommandPropertiesInterface = {
         name: 'unloop',
         description: 'unloop the song',
-        options: [],
         aliases: ['unloop']
     }
 

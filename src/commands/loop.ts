@@ -2,13 +2,21 @@ import {Command} from "./command";
 import {CommandInteraction, GuildMember, Message} from "discord.js";
 import MusicCommand from "./musicCommand";
 import SucessEmbed from "../embeds/sucessEmbed";
+import {typeSlashCommand} from "../enumerations/typeSlashCommand.enum";
 
 export default class Loop extends MusicCommand implements Command {
 
     static properties: CommandPropertiesInterface = {
         name: 'loop',
         description: 'loop the song',
-        options: [],
+        options: [
+            {
+                name: 'number',
+                type: typeSlashCommand.INTEGER,
+                description: 'Number of times the queue will repeat',
+                required: false
+            }
+        ],
         aliases: ['loop']
     }
 

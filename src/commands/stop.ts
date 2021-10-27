@@ -8,7 +8,6 @@ export default class Skip extends MusicCommand implements Command {
     static properties: CommandPropertiesInterface = {
         name: 'stop',
         description: 'Stop the song and clear queue',
-        options: [],
         aliases: ['stop']
     }
 

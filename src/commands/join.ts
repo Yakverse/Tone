@@ -8,7 +8,6 @@ export default class Join extends MusicCommand implements Command{
     static properties: CommandPropertiesInterface = {
         name: 'join',
         description: 'join a voice channel',
-        options: [],
         aliases: ['join', 'j']
     }
 

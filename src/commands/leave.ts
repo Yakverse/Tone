@@ -8,7 +8,6 @@ export default class Leave extends MusicCommand implements Command {
     static properties: CommandPropertiesInterface = {
         name: 'leave',
         description: 'Leave the voice channel',
-        options: [],
         aliases: ['leave', 'l']
     }
 
