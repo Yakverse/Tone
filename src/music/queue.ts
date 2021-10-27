@@ -66,9 +66,9 @@ export default class Queue {
         this.queueTime = 0;
         this.indexActualAudio = 0
         this.timesToPlay = 1
-        this.audioPlayer.stop()
         this.actualAudio = undefined
         this.length = 0;
+        this.audioPlayer.stop()
     }
 
     stop(){
@@ -102,6 +102,8 @@ export default class Queue {
 
     async processQueue(playlist: boolean = false){
         if (this.audioPlayer.state.status !== AudioPlayerStatus.Idle) return
+
+        if (this.audios.length === 0) return
 
         if (this.audios.length === this.indexActualAudio + 1){
             if (this.timesToPlay > 0){
