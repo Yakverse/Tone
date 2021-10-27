@@ -21,13 +21,13 @@ export default class QueueCommand extends MusicCommand implements Command {
             const guildId: string = message.member.guild.id;
             let currQueue: Queue | undefined = this.musicController.guilds.get(guildId);
             if (currQueue){
-                if(!currQueue.length){
+                if(!currQueue.size()){
                     throw new NoTracksInQueue;
                 }
                 const currindex: number = currQueue.indexActualAudio;
                 // Bithack for faster floor operation
                 // Force casts the float value into an int32_t
-                const lastPage: number = (currQueue.length-1) / this.MUSICS_PER_PAGE >> 0;
+                const lastPage: number = (currQueue.size() - 1) / this.MUSICS_PER_PAGE >> 0;
                 const currPage: number = this.getCurrPage(message,lastPage,currindex);
                 const messageContent: string = this.getMessageContent(currQueue,lastPage,currPage,currindex);
                 const actionRow: MessageActionRow = this.getActionRow(lastPage, currPage);
@@ -45,7 +45,7 @@ export default class QueueCommand extends MusicCommand implements Command {
     getMessageContent(currQueue:Queue,lastPage:number, currPage:number, currindex:number): string{
         let nMusicInCurrPage: number;
         if(lastPage == currPage){
-            nMusicInCurrPage = (currQueue.length % this.MUSICS_PER_PAGE) ? currQueue.length % this.MUSICS_PER_PAGE : this.MUSICS_PER_PAGE
+            nMusicInCurrPage = (currQueue.size() % this.MUSICS_PER_PAGE) ? currQueue.size() % this.MUSICS_PER_PAGE : this.MUSICS_PER_PAGE
         } else {
             nMusicInCurrPage = this.MUSICS_PER_PAGE;
         }
@@ -68,7 +68,7 @@ export default class QueueCommand extends MusicCommand implements Command {
             }
         }
         // Fotter
-        text += `\n${currQueue.length} Song${currQueue.length != 1 ? "s" : ""} In Queue | ${Utils.parseSecondsToISO(currQueue.queueTime)} Total Length | Loop: ${currQueue.timesToPlay <= 1 ? "❌" : "✔"} | Page ${currPage+1}/${lastPage+1}`;
+        text += `\n${currQueue.size()} Song${currQueue.size() != 1 ? "s" : ""} In Queue | ${Utils.parseSecondsToISO(currQueue.queueTime)} Total Length | Loop: ${currQueue.timesToPlay <= 1 ? "❌" : "✔"} | Page ${currPage+1}/${lastPage+1}`;
         text += "```";
         return text
     }
