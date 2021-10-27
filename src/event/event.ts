@@ -109,7 +109,6 @@ export class Event {
     }
 
     private handlerException(message: Message | Interaction , exception: unknown): void {
-        console.log(exception)
         if (exception instanceof BotError){
             if(!(message instanceof Interaction))
                 message.reply({ embeds: [new ErrorEmbed(exception.message).build()] });
@@ -121,6 +120,7 @@ export class Event {
                 message.reply({ ephemeral: true, embeds:[new ErrorEmbed(exception.message).build()], content:null , components: [] })
         }
         else{
+            App.logger.send(LogTypeEnum.ERROR, `${exception}`)
             message.channel!.send({ embeds: [new ErrorEmbed("Something went wrong").build()] });
         }
     }
