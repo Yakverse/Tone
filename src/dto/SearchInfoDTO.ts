@@ -5,14 +5,14 @@ export interface SearchInfoDTO {
     thumbnail: string
     title: string
     length: string
-    videos: VideoInfo[] | undefined
+    videos?: VideoInfo[]
 }
 
 export interface VideoInfo {
     id: string
     type: string
     url: string
-    thumbnail: string | undefined
+    thumbnail?: string | undefined
     title: string
     length: string,
 }

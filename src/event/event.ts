@@ -117,7 +117,7 @@ export class Event {
                 message.editReply({ embeds: [new ErrorEmbed(exception.message).build()] });
 
             else if (message instanceof ButtonInteraction)
-                message.reply({ ephemeral: true, embeds:[new ErrorEmbed(exception.message).build()], content:null , components: [] })
+                message.reply({ ephemeral: true, embeds: [new ErrorEmbed(exception.message).build()], content: null, components: [] })
         }
         else{
             App.logger.send(LogTypeEnum.ERROR, `${exception}`)

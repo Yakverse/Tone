@@ -32,7 +32,7 @@ export default class Play extends MusicCommand implements Command {
             return
         }
 
-        if (url instanceof Array) url = [url.join(' ')]
+        if (Array.isArray(url)) url = [url.join(' ')]
         else url = [url]
 
         if (!(message instanceof CommandInteraction)){

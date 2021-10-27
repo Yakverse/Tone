@@ -14,7 +14,7 @@ export default class Ping implements Command {
 
         if (!message.channel) return
         message.channel.send({embeds:[new Embeds({
-            title: '**Pong  🏓**',
+            title: '**Ping  🏓**',
             hexColor: ColorsEnum.YELLOW,
             description: `🧠 Calculating...`
         }).build()]}).then(async (msg) =>{
@@ -22,7 +22,7 @@ export default class Ping implements Command {
                 title: '**Pong  🏓**',
                 hexColor: ColorsEnum.WHITE,
             })
-            embed.addField(new Field(`🤖`, `<:discord:894070912519917639>`,true))
+            embed.addField(new Field(`🤖`, `<:discord:894070912519917639>`, true))
             embed.addField(new Field(`${msg.createdTimestamp - message.createdTimestamp}ms`, `**${Math.round(App.bot.client.ws.ping)}ms**`, true))
             msg.edit({embeds:[embed.build()]})
         })

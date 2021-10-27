@@ -36,8 +36,7 @@ export default class MusicSearch {
             url: query,
             thumbnail: info.artwork_url as string,
             title: info.title as string,
-            length: time,
-            videos: undefined
+            length: time
         }
     }
 
@@ -50,8 +49,7 @@ export default class MusicSearch {
                 url: res.videoDetails.video_url,
                 thumbnail: res.videoDetails.thumbnails[res.videoDetails.thumbnails.length - 1].url,
                 title: res.videoDetails.title,
-                length: Utils.parseSecondsToISO(parseInt(res.videoDetails.lengthSeconds)),
-                videos: undefined
+                length: Utils.parseSecondsToISO(parseInt(res.videoDetails.lengthSeconds))
             }
         }
         else {
@@ -67,8 +65,7 @@ export default class MusicSearch {
                     url: `https://www.youtube.com/watch?v=${item.id}`,
                     thumbnail: item.thumbnail.thumbnails[item.thumbnail.thumbnails.length - 1].url,
                     title: item.title,
-                    length: item.length.simpleText,
-                    videos: undefined
+                    length: item.length.simpleText
                 }
             } else if (item.type === VideoTypes.YOUTUBE_PLAYLIST) {
 
