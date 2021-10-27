@@ -5,9 +5,11 @@ import {ColorsEnum} from "../enumerations/Colors.enum";
 
 export default class Invite implements Command{
 
-    name: string = 'invite'
-    description: string = 'invite me to your discord server'
-    options: Array<string> = []
+    static properties: CommandPropertiesInterface = {
+        name: 'invite',
+        description: 'invite me to your discord server',
+        aliases: ['invite']
+    }
 
     execute(message: Message | CommandInteraction) {
         const row = new MessageActionRow()

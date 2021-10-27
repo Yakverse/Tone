@@ -9,6 +9,7 @@ import { ButtonFactory } from "../commands/buttonFactory";
 import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import { Command } from "../commands/command";
+import SucessEmbed from "../embeds/sucessEmbed";
 
 export class Event {
 
@@ -18,7 +19,7 @@ export class Event {
     constructor(client: Client){
         client.on('messageCreate', (message: Message) => { this.onMessage(message) })
         client.on('interactionCreate', (interaction: Interaction) => { this.onInteraction(interaction) })
-        client.on('guildCreate', (guild: Guild) => { this.onGuildAdd(guild.name, client.guilds.cache.size) })
+        client.on('guildCreate', (guild: Guild) => { this.onGuildAdd(guild, client.guilds.cache.size) })
         client.on('guildDelete', (guild: Guild) => { this.onGuildRemove(guild.name, client.guilds.cache.size) })
         client.on('voiceStateUpdate', (oldState: VoiceState, newState: VoiceState) => { this.onVoiceStateUpdate(oldState, newState) })
     }
@@ -86,16 +87,25 @@ export class Event {
         }
     }
 
-    onGuildAdd(guildName: string, numberGuilds: number){ App.logger.send(LogTypeEnum.JOIN_NEW_GUILD, `Joined a new guild: ${guildName} - Total servers: ${numberGuilds}`) }
+    onGuildAdd(guild: Guild, numberGuilds: number){
+        App.logger.send(LogTypeEnum.JOIN_NEW_GUILD, `Joined a new guild: ${guild.name} - Total servers: ${numberGuilds}`)
+        try {
+            for (const channel of guild.channels.cache.values()) {
+                if (channel.isText())
+                    if (channel.permissionsFor(guild.me!).has('SEND_MESSAGES')) {
+                        channel.send({ embeds: [new SucessEmbed(`Hello, I'm ${App.bot.client.user?.username}! You can use ${environment.prefix}help to see my commands 😉`).build()] })
+                        break
+                    }
+            }
+        } catch (e) {
+            App.logger.send(LogTypeEnum.ERROR, `${e}`)
+        }
+    }
     onGuildRemove(guildName: string, numberGuilds: number){ App.logger.send(LogTypeEnum.REMOVE_GUILD, `Removed from guild: ${guildName} - Total servers: ${numberGuilds}`) }
 
     onVoiceStateUpdate(oldState: VoiceState, newState: VoiceState) {
-        if (newState.guild.me && oldState.id == newState.guild.me.id && !newState.channelId) {
-            let embed = new Embeds({
-                hexColor: ColorsEnum.RED,
-                description: `I have been kicked from the voice channel 🙁`,
-            })
-            App.musicController.getOptionalQueue(oldState.guild.id)?.message.channel!.send({embeds:[embed.build()]})
+        if (newState.guild.me && oldState.id == newState.guild.me.id && !newState.channelId && App.musicController.getOptionalQueue(oldState.guild.id)) {
+            App.musicController.getOptionalQueue(oldState.guild.id)!.message.channel!.send({embeds:[new ErrorEmbed(`I have been kicked from the voice channel 🙁`).build()]})
             App.musicController.leaveAssert(oldState.guild.id)
         }
         if (!oldState.channel || !oldState.guild.me || !newState.guild.me) return

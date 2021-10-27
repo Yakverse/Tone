@@ -5,9 +5,11 @@ import SucessEmbed from "../embeds/sucessEmbed";
 
 export default class Leave extends MusicCommand implements Command {
 
-    name: string = 'leave'
-    description: string = 'Leave the voice channel'
-    options: Array<string> = []
+    static properties: CommandPropertiesInterface = {
+        name: 'leave',
+        description: 'Leave the voice channel',
+        aliases: ['leave', 'l']
+    }
 
     execute(message: Message | CommandInteraction) {
         if (message.member instanceof GuildMember) {

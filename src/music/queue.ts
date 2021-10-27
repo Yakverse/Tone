@@ -20,9 +20,12 @@ export default class Queue {
     actualAudio: Audio | undefined;
     indexActualAudio: number = 0;
     timesToPlay: number = 1;
-    length: number = 0;
 
     constructor(public voiceConnection: VoiceConnection, public message: Message | CommandInteraction ) {}
+
+    size(): number {
+        return this.audios.length;
+    }
 
     addListener(){
         this.audioPlayer.on('stateChange', async (oldState, newState) => {
@@ -37,7 +40,6 @@ export default class Queue {
         let title = audio.info.title;
 
         this.queueTime += Utils.parseISOToSeconds(time);
-        this.length +=1;
         this.audiosInfo.push([title, time]);
         this.audios.push(audio);
     }
@@ -67,7 +69,6 @@ export default class Queue {
         this.indexActualAudio = 0
         this.timesToPlay = 1
         this.actualAudio = undefined
-        this.length = 0;
         this.audioPlayer.stop()
     }
 

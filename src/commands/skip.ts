@@ -5,9 +5,11 @@ import SucessEmbed from "../embeds/sucessEmbed";
 
 export default class Skip extends MusicCommand implements Command {
 
-    name: string = 'skip'
-    description: string = 'Skip a song'
-    options: Array<string> = []
+    static properties: CommandPropertiesInterface = {
+        name: 'skip',
+        description: 'Skip a song',
+        aliases: ['skip', 's']
+    }
 
     execute(message: Message | CommandInteraction) {
         if (message.member instanceof GuildMember) {

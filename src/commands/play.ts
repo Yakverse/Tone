@@ -7,12 +7,23 @@ import MusicSearch from "../music/musicSearch";
 import App from "../main";
 import {LogTypeEnum} from "../enumerations/logType.enum";
 import { VideoTypes } from "../enumerations/videoType.enum";
+import {typeSlashCommand} from "../enumerations/typeSlashCommand.enum";
 
 export default class Play extends MusicCommand implements Command {
 
-    name: string = 'play'
-    description: string = 'Play a song'
-    options: Array<string> = []
+    static properties: CommandPropertiesInterface = {
+        name: 'play',
+        description: 'Play a song',
+        options: [
+            {
+                name: 'song',
+                type: typeSlashCommand.STRING,
+                description: 'URL or name of the song',
+                required: true
+            }
+        ],
+        aliases: ['play', 'p']
+    }
 
     execute(message: Message | CommandInteraction, args: Array<string>) {
         this.musicController.join(message)

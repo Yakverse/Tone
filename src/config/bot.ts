@@ -1,8 +1,8 @@
 import { Client, Intents } from "discord.js";
 import { Event } from "../event/event";
-import {typeSlashCommand} from "../enumerations/typeSlashCommand.enum";
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
+import * as commands from '../commands'
 
 export default class Bot {
 
@@ -19,78 +19,15 @@ export default class Bot {
         }
     });
     event: Event = new Event(this.client)
-    static slashCommands = {
-        body: [
-            {
-                name: "ping",
-                description: "ping, pong"
-            },
-            {
-                name: 'play',
-                description: 'Play a song',
-                options: [
-                    {
-                        name: 'song',
-                        type: typeSlashCommand.STRING,
-                        description: 'URL or name of the song',
-                        required: true
-                    }
-                ]
-            },
-            {
-                name: 'leave',
-                description: 'Leave the voice channel'
-            },
-            {
-                name: 'skip',
-                description: 'Skip the song'
-            },
-            {
-                name: 'pause',
-                description: 'Pause the song'
-            },
-            {
-                name: 'resume',
-                description: 'Resume the song'
-            },
-            {
-                name: 'stop',
-                description: 'Stop the song and clear queue'
-            },
-            {
-                name: 'loop',
-                description: 'loop the song',
-                options: [
-                    {
-                        name: 'number',
-                        type: typeSlashCommand.INTEGER,
-                        description: 'Number of times the queue will repeat',
-                        required: false
-                    }
-                ]
-            },
-            {
-                name: 'unloop',
-                description: 'unloop the song'
-            },
-            {
-                name: 'help',
-                description: 'need some help? wanna know the commands?'
-            },
-            {
-                name: 'queue',
-                description: 'show the current server queue',
-            },
-            {
-                name: 'invite',
-                description: 'invite me to your discord server'
-            },
-            {
-                name: 'join',
-                description: 'join a voice channel'
-            }
-        ]
-    }
+    commands = Object.values(commands)
+    commandName: string[] = this.commands.map(command => command.name)
+    slashCommands = this.commands.map(command => {
+        return {
+            name: command.properties.name,
+            description: command.properties.description,
+            options: command.properties.options
+        }
+    })
 
     constructor(private token: string | undefined){
         if (!token) throw new Error("Invalid token");
@@ -111,7 +48,7 @@ export default class Bot {
             const rest = new REST({ version: '9' }).setToken(this.token);
             await rest.put(
                 Routes.applicationCommands(this.client.user.id),
-                Bot.slashCommands
+                { body: this.slashCommands }
             ); 
         })();
     }
