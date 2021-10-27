@@ -3,12 +3,16 @@ import {environment} from "../environments/environment";
 import Bot from "../config/bot";
 import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
+import {Command} from "./command";
 
-export default class Help{
+export default class Help implements Command{
 
-    name: string = 'help'
-    description: string = 'need some help? wanna know the commands?'
-    options: Array<string> = []
+    static properties: CommandPropertiesInterface = {
+        name: 'help',
+        description: 'need some help? wanna know the commands?',
+        options: [],
+        aliases: ['help', 'h']
+    }
 
     execute(message: Message | CommandInteraction): void{
         let fields = ""

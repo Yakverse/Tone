@@ -5,9 +5,12 @@ import SucessEmbed from "../embeds/sucessEmbed";
 
 export default class Pause extends MusicCommand implements Command {
 
-    name: string = 'pause'
-    description: string = 'Pause the song'
-    options: Array<string> = []
+    static properties: CommandPropertiesInterface = {
+        name: 'pause',
+        description: 'Pause the song',
+        options: [],
+        aliases: ['pause']
+    }
 
     execute(message: Message | CommandInteraction)  {
         if(message.member instanceof GuildMember){

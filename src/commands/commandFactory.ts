@@ -9,42 +9,14 @@ export class CommandFactory {
     commands: string[] = ['ping', 'play', 'leave', 'skip', 'pause', 'resume', 'stop', 'loop', 'unloop', 'help', 'queue', 'invite', 'join']
 
     factory(command: string): Command | string[] {
-        switch (command) {
-            case 'ping':
-                return new commands.Ping()
-            case 'play':
-            case 'p':
-                return new commands.Play()
-            case 'leave':
-            case 'l':
-                return new commands.Leave()
-            case 'skip':
-            case 's':
-                return new commands.Skip()
-            case 'pause':
-                return new commands.Pause()
-            case 'resume':
-                return new commands.Resume()
-            case 'stop':
-                return new commands.Stop()
-            case 'loop':
-                return new commands.Loop()
-            case 'unloop':
-                return new commands.Unloop()
-            case 'help':
-            case 'h':
-                return new commands.Help()
-            case 'queue':
-            case 'q':
-                return new commands.Queue()
-            case 'invite':
-                return new commands.Invite()
-            case 'join':
-            case 'j':
-                return new commands.Join()
-            default:
-                return this.checkMispelled(command);
+        for (let commandClass of Object.values(commands)) {
+            if (commandClass.properties.aliases.includes(command)){
+                return new commandClass()
+            }
         }
+
+        return this.checkMispelled(command);
+
     }
 
     checkMispelled(command: string): string[] {

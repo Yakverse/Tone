@@ -5,9 +5,12 @@ import SucessEmbed from "../embeds/sucessEmbed";
 
 export default class Loop extends MusicCommand implements Command {
 
-    name: string = 'loop'
-    description: string = 'loop the song'
-    options: Array<string> = []
+    static properties: CommandPropertiesInterface = {
+        name: 'loop',
+        description: 'loop the song',
+        options: [],
+        aliases: ['loop']
+    }
 
     execute(message: Message | CommandInteraction, args: Array<string>) {
         if(message.member instanceof GuildMember){

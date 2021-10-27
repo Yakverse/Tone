@@ -10,9 +10,12 @@ import { VideoTypes } from "../enumerations/videoType.enum";
 
 export default class Play extends MusicCommand implements Command {
 
-    name: string = 'play'
-    description: string = 'Play a song'
-    options: Array<string> = []
+    static properties: CommandPropertiesInterface = {
+        name: 'play',
+        description: 'Play a song',
+        options: [],
+        aliases: ['play', 'p']
+    }
 
     execute(message: Message | CommandInteraction, args: Array<string>) {
         this.musicController.join(message)

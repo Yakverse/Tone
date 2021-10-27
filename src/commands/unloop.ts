@@ -5,9 +5,12 @@ import SucessEmbed from "../embeds/sucessEmbed";
 
 export default class Unloop extends MusicCommand implements Command {
 
-    name: string = 'unloop'
-    description: string = 'unloop the song'
-    options: Array<string> = []
+    static properties: CommandPropertiesInterface = {
+        name: 'unloop',
+        description: 'unloop the song',
+        options: [],
+        aliases: ['unloop']
+    }
 
     execute(message: Message | CommandInteraction) {
         if(message.member instanceof GuildMember){

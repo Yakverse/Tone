@@ -6,9 +6,12 @@ import App from "../main";
 
 export default class Ping implements Command {
 
-    name: string = 'ping'
-    description: string = 'Test ping'
-    options: Array<string> = []
+    static properties: CommandPropertiesInterface = {
+        name: 'ping',
+        description: 'Test ping',
+        options: [],
+        aliases: ['ping']
+    }
 
     execute(message: Message | CommandInteraction): void{
 

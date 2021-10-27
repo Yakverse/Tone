@@ -5,9 +5,12 @@ import SucessEmbed from "../embeds/sucessEmbed";
 
 export default class Join extends MusicCommand implements Command{
 
-    name: string = 'join';
-    description: string = 'join a voice channel';
-    options: Array<string> = [];
+    static properties: CommandPropertiesInterface = {
+        name: 'join',
+        description: 'join a voice channel',
+        options: [],
+        aliases: ['join', 'j']
+    }
 
     execute(message: Message | CommandInteraction): void {
         this.musicController.join(message)
