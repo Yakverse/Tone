@@ -59,7 +59,7 @@ export class Event {
         try{ 
             let factory = this.commandFactory.factory(command)
 
-            if (typeof factory === "function"){
+            if (!Array.isArray(factory)){
                 factory = factory as Command
                 if (!(message instanceof Interaction)) factory.execute(message, args)
                 else if (message instanceof Interaction) factory.execute(message, null)
@@ -109,6 +109,7 @@ export class Event {
     }
 
     private handlerException(message: Message | Interaction , exception: unknown): void {
+        console.log(exception)
         if (exception instanceof BotError){
             if(!(message instanceof Interaction))
                 message.reply({ embeds: [new ErrorEmbed(exception.message).build()] });
