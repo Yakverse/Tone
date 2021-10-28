@@ -12,8 +12,7 @@ import BotIsProcessingError from "../errors/BotIsProcessingError";
 import Utils from "../utils/utils";
 
 export default class Queue {
-    // Nome - Duração
-    audiosInfo: Array<[string, string]> = new Array<[string, string]>();
+
     queueTime: number = 0;
     audios: Array<Audio> = new Array<Audio>();
     audioPlayer: AudioPlayer = createAudioPlayer();
@@ -32,11 +31,8 @@ export default class Queue {
     }
 
     addAudio(audio: Audio){
-        let time = audio.info.length;
-        let title = audio.info.title;
+        this.queueTime += Utils.parseISOToSeconds(audio.info.length);
 
-        this.queueTime += Utils.parseISOToSeconds(time);
-        this.audiosInfo.push([title, time]);
         this.audios.push(audio);
     }
 
@@ -56,7 +52,6 @@ export default class Queue {
 
     private clearAudios(){
         this.audios = []
-        this.audiosInfo = [];
         this.queueTime = 0;
         this.indexActualAudio = 0
         this.timesToPlay = 1

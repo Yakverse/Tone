@@ -5,6 +5,7 @@ import MusicCommand from "./musicCommand";
 import Utils from "../utils/utils";
 import BotNotInAVoiceChannel from "../errors/botNotInAVoiceChannel";
 import NoTracksInQueue from "../errors/NoTracksInQueue";
+import {VideoInfo} from "../dto/SearchInfoDTO";
 
 export default class QueueCommand extends MusicCommand implements Command {
 
@@ -58,13 +59,13 @@ export default class QueueCommand extends MusicCommand implements Command {
         // Body
         let text: string = "```";
         for ( let i = 0; i < nMusicInCurrPage; i++) {
-            let musInfo: [string, string] = currQueue.audiosInfo[currPage*this.MUSICS_PER_PAGE+i];
+            let musInfo: VideoInfo = currQueue.audios[currPage*this.MUSICS_PER_PAGE+i].info;
             if(i == currindex%this.MUSICS_PER_PAGE && isCurrentMusicInCurrentPage ){
                 text += `${STRING_PADDING}⬐ current track\n`;
-                text += `${(currPage*this.MUSICS_PER_PAGE+i+1).toString()}. ${Utils.formatString(musInfo[0])} - ${musInfo[1]}\n`;
+                text += `${(currPage*this.MUSICS_PER_PAGE+i+1).toString()}. ${Utils.formatString(musInfo.title)} - ${musInfo.length}\n`;
                 text += `${STRING_PADDING}⬑ current track\n`;
             } else {
-                text += `${(currPage*this.MUSICS_PER_PAGE+i+1).toString()}. ${Utils.formatString(musInfo[0])} - ${musInfo[1]}\n`;
+                text += `${(currPage*this.MUSICS_PER_PAGE+i+1).toString()}. ${Utils.formatString(musInfo.title)} - ${musInfo.length}\n`;
             }
         }
         // Fotter
