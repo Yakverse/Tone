@@ -60,12 +60,15 @@ export default class QueueCommand extends MusicCommand implements Command {
         let text: string = "```";
         for ( let i = 0; i < nMusicInCurrPage; i++) {
             let musInfo: VideoInfo = currQueue.audios[currPage*this.MUSICS_PER_PAGE+i].info;
+            let musicTitle = musInfo.title;
+            let musicLength = musInfo.length;
+            let lineContent = `${Utils.formatString(`${(currPage * this.MUSICS_PER_PAGE + i + 1).toString()}. ${musicTitle}`, 55)} - ${musicLength}\n`
             if(i == currindex%this.MUSICS_PER_PAGE && isCurrentMusicInCurrentPage ){
                 text += `${STRING_PADDING}⬐ current track\n`;
-                text += `${(currPage*this.MUSICS_PER_PAGE+i+1).toString()}. ${Utils.formatString(musInfo.title)} - ${musInfo.length}\n`;
+                text += lineContent;
                 text += `${STRING_PADDING}⬑ current track\n`;
             } else {
-                text += `${(currPage*this.MUSICS_PER_PAGE+i+1).toString()}. ${Utils.formatString(musInfo.title)} - ${musInfo.length}\n`;
+                text += lineContent;
             }
         }
         // Fotter
@@ -93,7 +96,6 @@ export default class QueueCommand extends MusicCommand implements Command {
                     break;
                 case "L":
                     currPage = lastPage;
-                    console.log(currPage);
                     break;
                 default:
                     throw new TypeError();

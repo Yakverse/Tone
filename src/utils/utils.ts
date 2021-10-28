@@ -1,14 +1,13 @@
 export default class Utils{
 
 
-    static formatString(text: string): string{
-        const STRING_SIZE = 50
+    static formatString(text: string, stringSize: number): string{
 
         let strLen = text.length;
-        if (strLen > STRING_SIZE){
-            return text.substr(0, STRING_SIZE-1) + "…";
+        if (strLen > stringSize){
+            return text.substr(0, stringSize-1) + "…";
         }
-        return text.padEnd(STRING_SIZE," ");
+        return text.padEnd(stringSize," ");
     }
 
     static parseSecondsToISO(lenghtSeconds: number): string{
