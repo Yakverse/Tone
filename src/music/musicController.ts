@@ -75,8 +75,7 @@ export default class MusicController {
     async addQueue(guildId: string, videoInfo: SearchInfoDTO, message: Message | null){
         const queue: Queue = this.getQueue(guildId)
 
-        if (message)
-            queue.updateMessage(message);
+        if (message) queue.message = message
 
         if (videoInfo.type === VideoTypes.YOUTUBE_VIDEO || videoInfo.type === VideoTypes.SOUNDCLOUD)
             queue.addAudio(new Audio(videoInfo));

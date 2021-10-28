@@ -23,10 +23,6 @@ export default class Queue {
 
     constructor(public voiceConnection: VoiceConnection, public message: Message | CommandInteraction ) {}
 
-    size(): number {
-        return this.audios.length;
-    }
-
     addListener(){
         this.audioPlayer.on('stateChange', async (oldState, newState) => {
             if (newState.status === AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) await this.processQueue()
@@ -42,10 +38,6 @@ export default class Queue {
         this.queueTime += Utils.parseISOToSeconds(time);
         this.audiosInfo.push([title, time]);
         this.audios.push(audio);
-    }
-
-    updateMessage(message: Message | CommandInteraction){
-        this.message = message;
     }
 
     pause(){
