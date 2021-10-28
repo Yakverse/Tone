@@ -66,9 +66,9 @@ export default class Play extends MusicCommand implements Command {
             let embed = new Embeds({
                 hexColor: ColorsEnum.RED,
                 title: `Error`,
-                description: error.name
+                description: "An error occurred"
             })
-            console.log(error)
+            if (error.statusCode?.toString() == "410") embed.setDescription("Error searching music, this song is probably age restricted")
             App.logger.send(LogTypeEnum.ERROR, `${error}`)
             if (!(message instanceof CommandInteraction)) 
                 await message.edit({embeds:[embed.build()]})
