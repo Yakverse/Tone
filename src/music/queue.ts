@@ -26,10 +26,15 @@ export default class Queue {
             if (newState.status === AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) await this.processQueue()
         })
 
-        this.audioPlayer.on('error', (error) => {
+        this.audioPlayer.on('error', async (error) => {
             App.logger.send(LogTypeEnum.ERROR, `Player Error: ${error}`)
-            this.message.channel?.send({ embeds: [new ErrorEmbed(`There was a problem while playing this song. I skipped to the next. Sorry! 😢`).build()] })
-            this.skip()
+            try{
+                this.audioPlayer.play(await this.actualAudio!.createAudio())
+                this.message.channel?.send({ embeds: [new ErrorEmbed(`There was a problem while playing this song. I'll restart the music to you. Sorry!`).build()] })
+            } catch (e) {
+                this.skip()
+                this.message.channel?.send({ embeds: [new ErrorEmbed(`There was a problem while playing this song. I'll skip to the next. Sorry! 😢`).build()] })
+            }
         })
 
         this.voiceConnection.subscribe(<AudioPlayer> this.audioPlayer)
