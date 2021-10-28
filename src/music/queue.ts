@@ -3,13 +3,12 @@ import {AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, VoiceC
 import { CommandInteraction, Message } from "discord.js";
 import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
-import NoTracksToSkip from "../errors/noTracksToSkip";
 import MusicAlreadyPaused from "../errors/MusicAlreadyPaused";
 import MusicAlreadyPlaying from "../errors/MusicAlreadyPlaying";
 import App from "../main";
 import { LogTypeEnum } from "../enumerations/logType.enum";
-import BotIsProcessingError from "../errors/BotIsProcessingError";
 import Utils from "../utils/utils";
+import {ErrorEmbed} from "../embeds/errorEmbed";
 
 export default class Queue {
 
@@ -25,6 +24,12 @@ export default class Queue {
     addListener(){
         this.audioPlayer.on('stateChange', async (oldState, newState) => {
             if (newState.status === AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) await this.processQueue()
+        })
+
+        this.audioPlayer.on('error', (error) => {
+            App.logger.send(LogTypeEnum.ERROR, `Player Error: ${error}`)
+            this.message.channel?.send({ embeds: [new ErrorEmbed(`There was a problem while playing this song. I skipped to the next. Sorry! 😢`).build()] })
+            this.skip()
         })
 
         this.voiceConnection.subscribe(<AudioPlayer> this.audioPlayer)
@@ -73,12 +78,6 @@ export default class Queue {
     }
 
     skip(){
-        if(this.audios.length == 0)
-            throw new NoTracksToSkip();
-
-        if(this.audioPlayer.state.status === AudioPlayerStatus.Idle)
-            throw new BotIsProcessingError();
-
         this.audioPlayer.stop();
         this.actualAudio = undefined;
     }

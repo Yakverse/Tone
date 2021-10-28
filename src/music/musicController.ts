@@ -1,4 +1,4 @@
-import {joinVoiceChannel, VoiceConnection} from "@discordjs/voice"
+import {AudioPlayerStatus, joinVoiceChannel, VoiceConnection} from "@discordjs/voice"
 import Audio from "./audio";
 import Queue from "./queue";
 import {ButtonInteraction, CommandInteraction, GuildMember, Message} from "discord.js";
@@ -9,6 +9,8 @@ import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import {SearchInfoDTO} from "../dto/SearchInfoDTO";
 import { VideoTypes } from "../enumerations/videoType.enum";
+import NoTracksToSkip from "../errors/noTracksToSkip";
+import BotIsProcessingError from "../errors/BotIsProcessingError";
 
 export default class MusicController {
 
@@ -69,7 +71,13 @@ export default class MusicController {
 
     skip(message: Message | CommandInteraction){
         this.isInSameVoiceChannel(message)
-        this.getQueue(message.guildId!).skip()
+        const queue = this.getQueue(message.guildId!)
+
+        if(queue.audios.length == 0) throw new NoTracksToSkip();
+
+        if(queue.audioPlayer.state.status === AudioPlayerStatus.Idle) throw new BotIsProcessingError();
+
+        queue.skip()
     }
 
     async addQueue(guildId: string, videoInfo: SearchInfoDTO, message: Message | null){
