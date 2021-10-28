@@ -95,7 +95,10 @@ export default class Queue {
     async processQueue(playlist: boolean = false){
         if (this.audioPlayer.state.status !== AudioPlayerStatus.Idle) return
 
-        if (this.audios.length === 0) return
+        if (this.audios.length === 0) {
+            App.InactivityHandler.createNoMusicTimeout(this.message.guild!.id, this)
+            return
+        }
 
         if (this.audios.length === this.indexActualAudio + 1){
             if (this.timesToPlay > 0){

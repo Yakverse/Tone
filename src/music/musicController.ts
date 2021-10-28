@@ -11,6 +11,7 @@ import {SearchInfoDTO} from "../dto/SearchInfoDTO";
 import { VideoTypes } from "../enumerations/videoType.enum";
 import NoTracksToSkip from "../errors/noTracksToSkip";
 import BotIsProcessingError from "../errors/BotIsProcessingError";
+import App from "../main";
 
 export default class MusicController {
 
@@ -28,12 +29,14 @@ export default class MusicController {
         return undefined
     }
 
-    configGuildQueue(voiceConnection: VoiceConnection, guildId: string, message: Message | CommandInteraction){
+    configGuildQueue(voiceConnection: VoiceConnection, guildId: string, message: Message | CommandInteraction): Queue {
 
         let queue: Queue | undefined = this.guilds.get(guildId)
         if (!queue) queue = this.guilds.set(guildId, new Queue(voiceConnection, message)).get(guildId)
 
         queue!.addListener()
+
+        return queue!
     }
     
     pause(message: Message | CommandInteraction){
@@ -112,9 +115,9 @@ export default class MusicController {
         this.isInAVoiceChannel(message)
         if (message.member instanceof GuildMember && message.member.voice.channel) {
             const channel = message.member.voice.channel
-            const track: Queue | undefined = this.guilds.get(channel.guildId)
-            if (track) {
-                if (track.voiceConnection.joinConfig.channelId != channel.id) {
+            let queue: Queue | undefined = this.guilds.get(channel.guildId)
+            if (queue) {
+                if (queue.voiceConnection.joinConfig.channelId != channel.id) {
                     let embed = new Embeds({
                         hexColor: ColorsEnum.RED,
                         description: `Sorry, I'm in OTHER channel with OTHER friends now`,
@@ -124,7 +127,7 @@ export default class MusicController {
                 }
 
             } else {
-                this.configGuildQueue(
+                queue = this.configGuildQueue(
                     joinVoiceChannel({
                         channelId: channel.id,
                         guildId: channel.guild.id,
@@ -133,6 +136,7 @@ export default class MusicController {
                     channel.guildId,
                     message
                 )
+                App.InactivityHandler.createNoMusicTimeout(message.guild!.id, queue)
             }
         }
     }

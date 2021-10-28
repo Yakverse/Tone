@@ -1,4 +1,4 @@
-import { Message, VoiceState } from "discord.js"
+import { VoiceState } from "discord.js"
 import { Embeds } from "../embeds/embed"
 import { ColorsEnum } from "../enumerations/Colors.enum"
 import { IMusicTimeout, IAloneTimeout } from "../interfaces/Timeout.interface"
@@ -55,8 +55,7 @@ export class InactivityHandler {
                 description: `Leaving due to inactivity`,
             })
 
-            if (queue.message && queue.message instanceof Message) await queue.message.edit({ embeds: [embed.build()] })
-            else if (queue.message) await queue.message.editReply({ embeds: [embed.build()] })
+            await queue.message.channel?.send({ embeds: [embed.build()] })
 
         } else if (state) 
             App.musicController.leave(null, state.guild.id)
