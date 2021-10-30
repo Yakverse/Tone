@@ -23,17 +23,21 @@ export default class Queue {
 
     addListener(){
         this.audioPlayer.on('stateChange', async (oldState, newState) => {
-            if (newState.status === AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) await this.processQueue()
+            if (newState.status === AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) {
+                if (oldState.status != AudioPlayerStatus.Buffering) {
+                    await this.processQueue()
+                }
+            }
         })
 
         this.audioPlayer.on('error', async (error) => {
             App.logger.send(LogTypeEnum.ERROR, `Player Error: ${error}`)
             try{
-                this.audioPlayer.play(await this.actualAudio!.createAudio())
-                this.message.channel?.send({ embeds: [new ErrorEmbed(`There was a problem while playing this song. I'll restart the music to you. Sorry!`).build()] })
+                if (this.message && this.message instanceof Message) await this.message.edit({ embeds: [new ErrorEmbed(`There was a problem while playing this song. I'll restart the music to you. Sorry!`).build()] })
+                else if (this.message) await this.message.editReply({ embeds: [new ErrorEmbed(`There was a problem while playing this song. I'll restart the music to you. Sorry!`).build()] })
+                await this.playAudio(this.actualAudio!)
             } catch (e) {
-                this.skip()
-                this.message.channel?.send({ embeds: [new ErrorEmbed(`There was a problem while playing this song. I'll skip to the next. Sorry! 😢`).build()] })
+                App.logger.send(LogTypeEnum.ERROR, `Error while trying to restart the music: ${e}`)
             }
         })
 
@@ -84,7 +88,6 @@ export default class Queue {
 
     skip(){
         this.audioPlayer.stop();
-        this.actualAudio = undefined;
     }
 
     leave(){
@@ -114,26 +117,7 @@ export default class Queue {
 
         try {
             this.actualAudio = this.audios[this.indexActualAudio]
-            const audioResource: AudioResource<Audio> = await this.actualAudio.createAudio()
-            App.InactivityHandler.deleteNoMusicTimeout(this.message.guild!.id)
-            this.audioPlayer.play(audioResource)
-
-            const title = audioResource.metadata.info.title
-            const image = audioResource.metadata.info.thumbnail
-            const duration = audioResource.metadata.info.length
-
-            if (this.message.guild) App.logger.send(LogTypeEnum.PLAY_MUSIC, `Playing ${title} in ${this.message.guild.name}`)
-            else App.logger.send(LogTypeEnum.PLAY_MUSIC, `Playing ${title} in DM`)
-
-            const embed = new Embeds({
-                title: '🎵 Now playing ',
-                hexColor: ColorsEnum.GREEN,
-                description: `${title} - **${duration}**`
-            })
-            embed.options.image = image
-
-            if (this.message && this.message instanceof Message) await this.message.edit({ embeds: [embed.build()] })
-            else if (this.message) await this.message.editReply({ embeds: [embed.build()] })
+            this.playAudio(this.actualAudio)
         }
         catch (e) {
             const embed = new Embeds({
@@ -149,5 +133,28 @@ export default class Queue {
 
             this.processQueue()
         }
+    }
+
+    private async playAudio(audio: Audio){
+        const audioResource: AudioResource<Audio> = await audio.createAudio()
+        App.InactivityHandler.deleteNoMusicTimeout(this.message.guild!.id)
+        this.audioPlayer.play(audioResource)
+
+        const title = audioResource.metadata.info.title
+        const image = audioResource.metadata.info.thumbnail
+        const duration = audioResource.metadata.info.length
+
+        if (this.message.guild) App.logger.send(LogTypeEnum.PLAY_MUSIC, `Playing ${title} in ${this.message.guild.name}`)
+        else App.logger.send(LogTypeEnum.PLAY_MUSIC, `Playing ${title} in DM`)
+
+        const embed = new Embeds({
+            title: '🎵 Now playing ',
+            hexColor: ColorsEnum.GREEN,
+            description: `${title} - **${duration}**`
+        })
+        embed.options.image = image
+
+        if (this.message && this.message instanceof Message) await this.message.edit({ embeds: [embed.build()] })
+        else if (this.message) await this.message.editReply({ embeds: [embed.build()] })
     }
 }
