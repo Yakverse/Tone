@@ -8,7 +8,6 @@ import MusicAlreadyPlaying from "../errors/MusicAlreadyPlaying";
 import App from "../main";
 import { LogTypeEnum } from "../enumerations/logType.enum";
 import Utils from "../utils/utils";
-import {ErrorEmbed} from "../embeds/errorEmbed";
 
 export default class Queue {
 
@@ -33,8 +32,6 @@ export default class Queue {
         this.audioPlayer.on('error', async (error) => {
             App.logger.send(LogTypeEnum.ERROR, `Player Error: ${error}`)
             try{
-                if (this.message && this.message instanceof Message) await this.message.edit({ embeds: [new ErrorEmbed(`There was a problem while playing this song. I'll restart the music to you. Sorry!`).build()] })
-                else if (this.message) await this.message.editReply({ embeds: [new ErrorEmbed(`There was a problem while playing this song. I'll restart the music to you. Sorry!`).build()] })
                 await this.playAudio(this.actualAudio!)
             } catch (e) {
                 App.logger.send(LogTypeEnum.ERROR, `Error while trying to restart the music: ${e}`)
