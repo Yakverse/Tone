@@ -1,5 +1,19 @@
 export default class Utils{
 
+    static shuffleArray(array: any[]){
+        let currentIndex = array.length,  randomIndex;
+
+        while (currentIndex != 0) {
+
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+
+            [array[currentIndex], array[randomIndex]] = [
+                array[randomIndex], array[currentIndex]];
+        }
+
+        return array;
+    }
 
     static formatString(text: string, stringSize: number): string{
 

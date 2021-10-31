@@ -47,6 +47,13 @@ export default class Queue {
         this.audios.push(audio);
     }
 
+    shuffle(){
+        const firstArraySlice: Array<Audio> = this.audios.slice(0, this.indexActualAudio + 1);
+        const secondArraySlice: Array<Audio> = this.audios.slice(this.indexActualAudio + 1);
+
+        this.audios = [...firstArraySlice, ...Utils.shuffleArray(secondArraySlice)];
+    }
+
     pause(){
         if( this.audioPlayer.state.status == "paused"){
             throw new MusicAlreadyPaused();

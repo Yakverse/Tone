@@ -38,6 +38,11 @@ export default class MusicController {
 
         return queue!
     }
+
+    shuffle(message: Message | CommandInteraction): void {
+        this.isInSameVoiceChannel(message)
+        this.getQueue(message.guildId!).shuffle()
+    }
     
     pause(message: Message | CommandInteraction){
         this.isInSameVoiceChannel(message)
