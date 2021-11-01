@@ -32,7 +32,9 @@ export default class Queue {
         this.audioPlayer.on('error', async (error) => {
             App.logger.send(LogTypeEnum.ERROR, `Player Error: ${error}`)
             try{
-                await this.playAudio(this.actualAudio!)
+                setTimeout(async () => {
+                    await this.playAudio(this.actualAudio!)
+                }, 1000)
             } catch (e) {
                 App.logger.send(LogTypeEnum.ERROR, `Error while trying to restart the music: ${e}`)
             }
