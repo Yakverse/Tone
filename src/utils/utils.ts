@@ -26,16 +26,11 @@ export default class Utils{
 
     static parseSecondsToISO(lenghtSeconds: number): string{
         let seconds = (lenghtSeconds % 60).toString();
-        seconds = seconds.length > 1 ? seconds.toString() : "0" + seconds.toString();
-        let minutes = (lenghtSeconds/60>>0)%60;
+        seconds = seconds.length > 1 ? seconds : "0" + seconds;
+        let minutes = ((lenghtSeconds/60>>0)%60).toString();
+        minutes = minutes.length > 1 ? minutes : "0" + minutes;
         let hours = lenghtSeconds/3600>>0;
-        let response = "";
-
-        if(hours > 0)
-            response += `${hours}:`
-        response += `${minutes}:${seconds}`
-        return response
-
+        return hours > 0 ? `${hours}:${minutes}:${seconds}` : `${minutes}:${seconds}`;
     }
 
     static parseISOToSeconds(ISO : string): number{
