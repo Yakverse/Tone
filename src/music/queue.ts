@@ -1,12 +1,12 @@
 import Audio from "./audio";
 import {AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, VoiceConnection} from "@discordjs/voice";
-import { CommandInteraction, Message } from "discord.js";
+import {CommandInteraction, Message} from "discord.js";
 import {Embeds} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import MusicAlreadyPaused from "../errors/MusicAlreadyPaused";
 import MusicAlreadyPlaying from "../errors/MusicAlreadyPlaying";
 import App from "../main";
-import { LogTypeEnum } from "../enumerations/logType.enum";
+import {LogTypeEnum} from "../enumerations/logType.enum";
 import Utils from "../utils/utils";
 
 export default class Queue {
@@ -30,13 +30,16 @@ export default class Queue {
         })
 
         this.audioPlayer.on('error', async (error) => {
+            console.log(error, this.audioPlayer.state)
             App.logger.send(LogTypeEnum.ERROR, `Player Error: ${error}`)
-            try{
-                setTimeout(async () => {
-                    await this.playAudio(this.actualAudio!)
-                }, 1000)
-            } catch (e) {
-                App.logger.send(LogTypeEnum.ERROR, `Error while trying to restart the music: ${e}`)
+            if (error.message === 'Status code: 403'){
+                try{
+                    setTimeout(async () => {
+                        await this.playAudio(this.actualAudio!)
+                    }, 1000)
+                } catch (e) {
+                    App.logger.send(LogTypeEnum.ERROR, `Error while trying to restart the music: ${e}`)
+                }
             }
         })
 

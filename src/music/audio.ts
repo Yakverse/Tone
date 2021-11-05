@@ -1,5 +1,5 @@
-import { AudioResource, createAudioResource, StreamType } from "@discordjs/voice";
-import ytdl from 'ytdl-core-discord';
+import {AudioResource, createAudioResource, demuxProbe, ProbeInfo} from "@discordjs/voice";
+import ytdl from 'ytdl-core';
 import { VideoInfo } from "../dto/SearchInfoDTO";
 import { LogTypeEnum } from "../enumerations/logType.enum";
 import { environment } from "../environments/environment";
@@ -13,17 +13,14 @@ export default class Audio {
     async createAudio(): Promise<AudioResource<Audio>>{
         return new Promise(async (resolve, reject) => {
             try{
-                let stream
-                let streamType
+                let originalStream
 
                 if (this.info.type === 'soundcloud'){
-                    streamType = StreamType.OggOpus;
-                    stream = await scdl.downloadFormat(this.info.url, scdl.FORMATS.OPUS)
+                    originalStream = await scdl.downloadFormat(this.info.url, scdl.FORMATS.OPUS)
 
                 } else {
                     let url: string = this.info.url
-                    streamType = StreamType.Opus;
-                    stream = await ytdl(url, {
+                    originalStream = await ytdl(url, {
                         quality: 'highestaudio',
                         filter: 'audioonly',
                         dlChunkSize: 0,
@@ -36,9 +33,22 @@ export default class Audio {
                     })
                 }
 
-                resolve(createAudioResource(stream, { metadata: this, inputType: streamType }))
+                const stream: ProbeInfo | void = await demuxProbe(originalStream).catch((e) => {
+                    App.logger.send(LogTypeEnum.ERROR, `Stream Error: ${e}`)
+                })
+
+                if (stream){
+                    resolve(createAudioResource(stream.stream, { metadata: this, inputType: stream.type }))
+                } else {
+                    setTimeout(() => {
+                        resolve(this.createAudio())
+                    }, 1000)
+                }
+
+
 
             } catch(e) {
+                console.log(e)
                 App.logger.send(LogTypeEnum.ERROR, `Stream Error: ${e}`)
                 reject('Error loading music, this song is probably age restricted')
             }
