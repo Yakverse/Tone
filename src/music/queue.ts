@@ -30,7 +30,6 @@ export default class Queue {
         })
 
         this.audioPlayer.on('error', async (error) => {
-            console.log(error, this.audioPlayer.state)
             App.logger.send(LogTypeEnum.ERROR, `Player Error: ${error}`)
             if (error.message === 'Status code: 403'){
                 try{
@@ -138,7 +137,7 @@ export default class Queue {
             if (this.message && this.message instanceof Message) await this.message.edit({ embeds: [embed.build()] })
             else if (this.message) await this.message.editReply({ embeds: [embed.build()] })
 
-            App.logger.send(LogTypeEnum.ERROR, `${e}`)
+            App.logger.send(LogTypeEnum.ERROR, `Error while trying to play the audio: ${e}`)
 
             this.processQueue()
         }
