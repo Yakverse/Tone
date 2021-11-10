@@ -7,7 +7,10 @@ export default class Logger {
     private URL: string = 'https://log-api.newrelic.com/log/v1'
 
     async send(logType: string, message: string): Promise<void>{
-        if (!this.logging) return
+        if (!this.logging) {
+            console.log(`${logType}: ${message}`)
+            return
+        }
 
         let payload = {
             timestamp: new Date().getTime(),
