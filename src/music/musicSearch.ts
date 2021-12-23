@@ -8,6 +8,7 @@ import { environment } from "../environments/environment";
 const youtubesearchapi = require('youtube-search-api');
 const scdl = require('soundcloud-downloader').default;
 const ytfps = require('@maroxy/ytfps');
+const spdl = require('spdl-core');
 
 export default class MusicSearch {
 
@@ -17,6 +18,10 @@ export default class MusicSearch {
         switch (true) {
             case (soundCloudRegex.test(query)):
                 return this.soundcloudSearch(query);
+            case (spdl.validateURL(query, 'track')):
+                return this.spotifySearch(query);
+            case (spdl.validateURL(query, 'playlist') || spdl.validateURL(query, 'album')):
+                throw new Error('Playlist and Albums are not supported yet');
             default:
                 return this.youtubeSearch(query);
         }
@@ -40,9 +45,30 @@ export default class MusicSearch {
         }
     }
 
+    private static async spotifySearch(query: string): Promise<SearchInfoDTO>{
+        const info = await spdl.getInfo(query)
+        const title = `${info.title} - ${info.artist}`
+        const youtubeInfo = await this.youtubeSearch(`${title} ${info.artist}`)
+
+        return {
+            id: youtubeInfo.id,
+            type: VideoTypes.SPOTIFY,
+            url: youtubeInfo.url,
+            thumbnail: info.thumbnail,
+            title: title,
+            length: youtubeInfo.length
+        }
+    }
+
     private static async youtubeSearch(query: string): Promise<SearchInfoDTO>{
         if (ytdl.validateURL(query)){
-            const res = await ytdl.getBasicInfo(query)
+            const res = await ytdl.getBasicInfo(query, {
+                requestOptions: {
+                    headers: {
+                        cookie: environment.cookie
+                    }
+                }
+            })
             return {
                 id: res.videoDetails.videoId,
                 type: VideoTypes.YOUTUBE_VIDEO,

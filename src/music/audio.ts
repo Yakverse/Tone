@@ -18,7 +18,8 @@ export default class Audio {
                 if (this.info.type === 'soundcloud'){
                     originalStream = await scdl.downloadFormat(this.info.url, scdl.FORMATS.OPUS)
 
-                } else {
+                }
+                else {
                     let url: string = this.info.url
                     originalStream = await ytdl(url, {
                         quality: 'highestaudio',

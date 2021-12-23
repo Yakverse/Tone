@@ -93,7 +93,7 @@ export default class MusicController {
 
         if (message) queue.message = message
 
-        if (videoInfo.type === VideoTypes.YOUTUBE_VIDEO || videoInfo.type === VideoTypes.SOUNDCLOUD)
+        if (videoInfo.type === VideoTypes.YOUTUBE_VIDEO || videoInfo.type === VideoTypes.SOUNDCLOUD || videoInfo.type === VideoTypes.SPOTIFY)
             queue.addAudio(new Audio(videoInfo));
         else // For now it's not necessary to check if it's a playlist.
             for (let video of videoInfo.videos!)

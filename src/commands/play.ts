@@ -66,9 +66,8 @@ export default class Play extends MusicCommand implements Command {
             let embed = new Embeds({
                 hexColor: ColorsEnum.RED,
                 title: `Error`,
-                description: "An error occurred"
+                description: error.message
             })
-            if (error.statusCode?.toString() == "410") embed.setDescription("Error searching music, this song is probably age restricted")
             App.logger.send(LogTypeEnum.ERROR, `${error}`)
             if (!(message instanceof CommandInteraction)) 
                 await message.edit({embeds:[embed.build()]})
@@ -78,7 +77,7 @@ export default class Play extends MusicCommand implements Command {
         if (!info) return
 
         let embed
-        if (info.type === VideoTypes.YOUTUBE_VIDEO || info.type === VideoTypes.SOUNDCLOUD){
+        if (info.type === VideoTypes.YOUTUBE_VIDEO || info.type === VideoTypes.SOUNDCLOUD || info.type === VideoTypes.SPOTIFY){
             embed = new Embeds({
                 hexColor: ColorsEnum.WHITE,
                 title: `🎶 Added to queue`,
