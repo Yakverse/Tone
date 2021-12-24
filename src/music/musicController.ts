@@ -5,13 +5,12 @@ import {ButtonInteraction, CommandInteraction, GuildMember, Message} from "disco
 import UserNotInAVoiceChannel from "../errors/userNotInAVoiceChannel";
 import BotNotInAVoiceChannel from "../errors/botNotInAVoiceChannel";
 import UserInWrongChannel from "../errors/userInWrongChannel";
-import {Embed} from "../embeds/embed";
-import {ColorsEnum} from "../enumerations/Colors.enum";
 import {SearchInfoDTO} from "../dto/SearchInfoDTO";
-import { VideoTypes } from "../enumerations/videoType.enum";
+import {VideoTypes} from "../enumerations/videoType.enum";
 import NoTracksToSkip from "../errors/noTracksToSkip";
 import BotIsProcessingError from "../errors/BotIsProcessingError";
 import App from "../main";
+import BotError from "../errors/botError";
 
 export default class MusicController {
 
@@ -119,30 +118,20 @@ export default class MusicController {
     join(message: Message | CommandInteraction){
         this.isInAVoiceChannel(message)
         if (message.member instanceof GuildMember && message.member.voice.channel) {
-            const channel = message.member.voice.channel
-            let queue: Queue | undefined = this.guilds.get(channel.guildId)
-            if (queue) {
-                if (queue.voiceConnection.joinConfig.channelId != channel.id) {
-                    let embed = new Embed({
-                        hexColor: ColorsEnum.RED,
-                        description: `Sorry, I'm in OTHER channel with OTHER friends now`,
-                    });
-                    message.reply({embeds: [embed.build()]});
-                    return;
-                }
-
-            } else {
-                queue = this.configGuildQueue(
-                    joinVoiceChannel({
-                        channelId: channel.id,
-                        guildId: channel.guild.id,
-                        adapterCreator: channel.guild.voiceAdapterCreator
-                    }),
-                    channel.guildId,
-                    message
-                )
-                App.InactivityHandler.createNoMusicTimeout(message.guild!.id, queue)
+            if (message.guild?.me?.voice.channelId != null && message.guild?.me?.voice.channelId !== message.member.voice.channel.id) {
+                throw new BotError("Sorry, I'm in OTHER channel with OTHER friends now", "Bot in a different channel")
             }
+            const channel = message.member.voice.channel
+            let queue: Queue | undefined = this.configGuildQueue(
+                joinVoiceChannel({
+                    channelId: channel.id,
+                    guildId: channel.guild.id,
+                    adapterCreator: channel.guild.voiceAdapterCreator
+                }),
+                channel.guildId,
+                message
+            )
+            App.InactivityHandler.createNoMusicTimeout(message.guild!.id, queue)
         }
     }
 
