@@ -14,7 +14,7 @@ export default class Skip extends MusicCommand implements Command {
     execute(message: Message | CommandInteraction) {
         if(message.member instanceof GuildMember){
             this.musicController.stop(message);
-            message.reply({embeds:[new SucessEmbed("Stop").build()]});
+            message.reply({embeds:[SucessEmbed.create("Stop ⏹").build()]});
         }
     }
 }

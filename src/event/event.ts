@@ -6,7 +6,7 @@ import { ErrorEmbed } from "../embeds/errorEmbed";
 import App from "../main";
 import { LogTypeEnum } from "../enumerations/logType.enum";
 import { ButtonFactory } from "../commands/buttonFactory";
-import {Embeds} from "../embeds/embed";
+import {Embed} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import { Command } from "../commands/command";
 import SucessEmbed from "../embeds/sucessEmbed";
@@ -74,12 +74,8 @@ export class Event {
                 else 
                     description =  `The most similar command is: \n${factory.join('\n')}`
 
-                let embed = new Embeds({
-                    hexColor: ColorsEnum.BLUE,
-                    title: "Command not found",
-                    description: description,
-                })
-                message.reply({ embeds: [embed.build()] })
+                let embed = Embed.create(description, ColorsEnum.BLUE, "Command not found")
+                    message.reply({ embeds: [embed.build()] })
             }
         }
         catch (e: unknown) {

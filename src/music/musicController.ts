@@ -5,7 +5,7 @@ import {ButtonInteraction, CommandInteraction, GuildMember, Message} from "disco
 import UserNotInAVoiceChannel from "../errors/userNotInAVoiceChannel";
 import BotNotInAVoiceChannel from "../errors/botNotInAVoiceChannel";
 import UserInWrongChannel from "../errors/userInWrongChannel";
-import {Embeds} from "../embeds/embed";
+import {Embed} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import {SearchInfoDTO} from "../dto/SearchInfoDTO";
 import { VideoTypes } from "../enumerations/videoType.enum";
@@ -123,7 +123,7 @@ export default class MusicController {
             let queue: Queue | undefined = this.guilds.get(channel.guildId)
             if (queue) {
                 if (queue.voiceConnection.joinConfig.channelId != channel.id) {
-                    let embed = new Embeds({
+                    let embed = new Embed({
                         hexColor: ColorsEnum.RED,
                         description: `Sorry, I'm in OTHER channel with OTHER friends now`,
                     });

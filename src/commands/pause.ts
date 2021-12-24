@@ -14,7 +14,7 @@ export default class Pause extends MusicCommand implements Command {
     execute(message: Message | CommandInteraction)  {
         if(message.member instanceof GuildMember){
             this.musicController.pause(message);
-            message.reply({embeds:[new SucessEmbed("Paused").build()]});
+            message.reply({embeds:[SucessEmbed.create("Paused ⏸").build()]});
         }
     }
 }

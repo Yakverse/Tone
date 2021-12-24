@@ -1,7 +1,7 @@
 import Audio from "./audio";
 import {AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, VoiceConnection} from "@discordjs/voice";
 import {CommandInteraction, Message} from "discord.js";
-import {Embeds} from "../embeds/embed";
+import {Embed} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import MusicAlreadyPaused from "../errors/MusicAlreadyPaused";
 import MusicAlreadyPlaying from "../errors/MusicAlreadyPlaying";
@@ -128,7 +128,7 @@ export default class Queue {
             this.playAudio(this.actualAudio)
         }
         catch (e) {
-            const embed = new Embeds({
+            const embed = new Embed({
                 title: 'Error loading music',
                 hexColor: ColorsEnum.RED,
                 description: 'This song is probably age restricted'
@@ -155,7 +155,7 @@ export default class Queue {
         if (this.message.guild) App.logger.send(LogTypeEnum.PLAY_MUSIC, `Playing ${title} in ${this.message.guild.name}`)
         else App.logger.send(LogTypeEnum.PLAY_MUSIC, `Playing ${title} in DM`)
 
-        const embed = new Embeds({
+        const embed = new Embed({
             title: '🎵 Now playing ',
             hexColor: ColorsEnum.GREEN,
             description: `${title} - **${duration}**`

@@ -1,4 +1,4 @@
-import {MessageEmbed} from "discord.js";
+import {HexColorString, MessageEmbed} from "discord.js";
 import {EmbedInterface} from "../interfaces/Embed.interface";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 
@@ -10,7 +10,7 @@ export class Field{
     }
 }
 
-export class Embeds{
+export class Embed {
 
     public fields : Array<Field> = [];
 
@@ -25,6 +25,14 @@ export class Embeds{
         if (!options.image) options.image = undefined
         if (!options.thumbnail) options.thumbnail = undefined
         if (!options.footer) options.footer = undefined
+    }
+
+    static create(description: string, hexColor: HexColorString, title?: string){
+        return new Embed({
+            description: description,
+            hexColor: hexColor,
+            title: title
+        })
     }
 
     setDescription(text: string){

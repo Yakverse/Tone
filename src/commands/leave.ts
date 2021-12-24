@@ -14,7 +14,7 @@ export default class Leave extends MusicCommand implements Command {
     execute(message: Message | CommandInteraction) {
         if (message.member instanceof GuildMember) {
             this.musicController.leave(message);
-            message.reply({embeds: [new SucessEmbed("Bye Bye!").build()]});
+            message.reply({embeds: [SucessEmbed.create("Bye Bye!").build()]});
         }
     }
 }
