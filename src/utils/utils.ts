@@ -34,14 +34,23 @@ export default class Utils{
     }
 
     static parseISOToSeconds(ISO : string): number{
-        let ISOArr = ISO.split(":");
-        let multi = 1;
-        let total = 0;
-        for (let i = ISOArr.length-1; i >= 0 ; i--){
-            total += parseInt(ISOArr[i])*multi;
-            multi *= 60;
+        if (!ISO){
+            return 0;
         }
-        return total;
+        let ISOArr = ISO.split(":").reverse();
+        let hours = 0, minutes = 0, seconds = 0;
+        switch (ISOArr.length) {
+            case 3:
+                hours   = parseInt(ISOArr[2]);
+            case 2:
+                minutes = parseInt(ISOArr[1]);
+            case 1:
+                seconds = parseInt(ISOArr[0]);
+                return hours * 3600 + minutes * 60 + seconds;
+            default:
+                // Não deve chegar aqui
+                return 0;
+        }
     }
 
     // https://www.30secondsofcode.org/js/s/levenshtein-distance
