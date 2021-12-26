@@ -2,6 +2,7 @@ import {AudioResource, createAudioResource, demuxProbe, ProbeInfo} from "@discor
 import ytdl from 'ytdl-core';
 import { VideoInfo } from "../dto/SearchInfoDTO";
 import { LogTypeEnum } from "../enumerations/logType.enum";
+import { environment } from "../environments/environment";
 import App from "../main";
 const scdl = require('soundcloud-downloader').default;
 
@@ -17,13 +18,19 @@ export default class Audio {
                 if (this.info.type === 'soundcloud'){
                     originalStream = await scdl.downloadFormat(this.info.url, scdl.FORMATS.OPUS)
 
-                } else {
+                }
+                else {
                     let url: string = this.info.url
                     originalStream = ytdl(url, {
                         quality: 'highestaudio',
                         filter: 'audioonly',
                         dlChunkSize: 0,
-                        highWaterMark: 1 << 25
+                        highWaterMark: 1 << 25,
+                        requestOptions: {
+                            headers: {
+                                cookie: environment.cookie
+                            }
+                        }
                     })
                 }
 

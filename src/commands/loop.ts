@@ -34,7 +34,7 @@ export default class Loop extends MusicCommand implements Command {
 
                 this.musicController.loop(message, number);
             }
-            message.reply({embeds:[new SucessEmbed("Looping!").build()]});
+            message.reply({embeds:[SucessEmbed.create("Looping!").build()]});
         }
     }
 }

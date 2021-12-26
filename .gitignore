@@ -2,3 +2,4 @@ node_modules/
 dist/
 environment.ts
 .idea/
+*-lock.json

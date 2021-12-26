@@ -13,7 +13,7 @@ export default class Shuffle extends MusicCommand implements Command{
 
     execute(message: Message | CommandInteraction): void {
         this.musicController.shuffle(message)
-        message.reply({embeds: [new SucessEmbed("Shuffled! 🤪").build()]})
+        message.reply({embeds: [SucessEmbed.create('Shuffled! 🤪').build()]})
     }
 
 

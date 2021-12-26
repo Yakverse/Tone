@@ -1,13 +1,14 @@
 import {CommandInteraction, Message} from "discord.js";
 import { Command } from "./command";
 import MusicCommand from "./musicCommand";
-import {Embeds} from "../embeds/embed";
+import {Embed} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import MusicSearch from "../music/musicSearch";
 import App from "../main";
 import {LogTypeEnum} from "../enumerations/logType.enum";
 import { VideoTypes } from "../enumerations/videoType.enum";
 import {typeSlashCommand} from "../enumerations/typeSlashCommand.enum";
+import {ErrorEmbed} from "../embeds/errorEmbed";
 
 export default class Play extends MusicCommand implements Command {
 
@@ -35,10 +36,7 @@ export default class Play extends MusicCommand implements Command {
 
     private async process(message: Message | CommandInteraction, url: string | Array<string>) {
         if (url.length === 0){
-            let embed = new Embeds({
-                hexColor: ColorsEnum.RED,
-                description: '**Invalid music**',
-            });
+            let embed = ErrorEmbed.create('**Invalid music**')
             await message.reply({embeds: [embed.build()]})
             return
         }
@@ -46,29 +44,14 @@ export default class Play extends MusicCommand implements Command {
         if (Array.isArray(url)) url = [url.join(' ')]
         else url = [url]
 
-        if (!(message instanceof CommandInteraction)){
-            let embed = new Embeds({
-                hexColor: ColorsEnum.YELLOW,
-                description: `**🎵 Searching 🔎 ${url[0]}**`,
-            });
-            message = await message.reply({embeds: [embed.build()]})
-
-        }
-        else{
-            let embed = new Embeds({
-                hexColor: ColorsEnum.YELLOW,
-                description: `**🎵 Searching 🔎 ${url[0]}**`,
-            });
-            await message.reply({embeds: [embed.build()]})
-        }
+        let searchEmbed = Embed.create(`**🎵 Searching 🔎 ${url[0]}**`, ColorsEnum.YELLOW)
+        if (!(message instanceof CommandInteraction))
+            message = await message.reply({embeds: [searchEmbed.build()]})
+        else
+            await message.reply({embeds: [searchEmbed.build()]})
 
         const info = await MusicSearch.search(url[0]).catch(async error => {
-            let embed = new Embeds({
-                hexColor: ColorsEnum.RED,
-                title: `Error`,
-                description: "An error occurred"
-            })
-            if (error.statusCode?.toString() == "410") embed.setDescription("Error searching music, this song is probably age restricted")
+            let embed = ErrorEmbed.create(error.message)
             App.logger.send(LogTypeEnum.ERROR, `${error}`)
             if (!(message instanceof CommandInteraction)) 
                 await message.edit({embeds:[embed.build()]})
@@ -77,22 +60,14 @@ export default class Play extends MusicCommand implements Command {
         })
         if (!info) return
 
-        let embed
-        if (info.type === VideoTypes.YOUTUBE_VIDEO || info.type === VideoTypes.SOUNDCLOUD){
-            embed = new Embeds({
-                hexColor: ColorsEnum.WHITE,
-                title: `🎶 Added to queue`,
-                description: `${info.title}`
-            })
-            embed.options.thumbnail = info.thumbnail
-        } else { // For now it's not necessary to check if it's a playlist.
-            embed = new Embeds({
-                hexColor: ColorsEnum.WHITE,
-                title: `🎶 Added ${info.length} songs queue`,
-                description: `${info.title}`,
-            })
-            embed.options.thumbnail = info.thumbnail
-        }
+        let embedMessage
+        if (info.type === VideoTypes.YOUTUBE_VIDEO || info.type === VideoTypes.SOUNDCLOUD || info.type === VideoTypes.SPOTIFY)
+            embedMessage = `🎶 Added to queue`
+        else
+            embedMessage = `🎶 Added ${info.length} songs queue`
+
+        let embed = Embed.create(embedMessage, ColorsEnum.WHITE, `${info.title}`)
+        embed.options.thumbnail = info.thumbnail
 
         if (!(message instanceof CommandInteraction)) {
             await message.edit({embeds:[embed.build()]})

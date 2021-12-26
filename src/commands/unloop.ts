@@ -14,7 +14,7 @@ export default class Unloop extends MusicCommand implements Command {
     execute(message: Message | CommandInteraction) {
         if(message.member instanceof GuildMember){
             this.musicController.unloop(message);
-            message.reply({embeds:[new SucessEmbed("Unlooped").build()]});
+            message.reply({embeds:[SucessEmbed.create("Unlooped").build()]});
         }
     }
 }

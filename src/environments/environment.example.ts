@@ -4,5 +4,6 @@ export const environment = {
     log: '',
     newRelicKey: '',
     inviteURL: '',
+    cookie: '',
     playlistLimit: 0,
 }

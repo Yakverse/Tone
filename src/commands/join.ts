@@ -13,7 +13,7 @@ export default class Join extends MusicCommand implements Command{
 
     execute(message: Message | CommandInteraction): void {
         this.musicController.join(message)
-        message.reply({embeds: [new SucessEmbed("What's Up?").build()]})
+        message.reply({embeds: [SucessEmbed.create("What's Up?").build()]})
     }
 
 

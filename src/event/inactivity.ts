@@ -1,5 +1,5 @@
 import { VoiceState } from "discord.js"
-import { Embeds } from "../embeds/embed"
+import { Embed } from "../embeds/embed"
 import { ColorsEnum } from "../enumerations/Colors.enum"
 import { IMusicTimeout, IAloneTimeout } from "../interfaces/Timeout.interface"
 import App from "../main"
@@ -50,7 +50,7 @@ export class InactivityHandler {
         if (queue && !queue.audios.length){
             App.musicController.leave(null, guildId)
 
-            let embed = new Embeds({
+            let embed = new Embed({
                 hexColor: ColorsEnum.BLUE,
                 description: `Leaving due to inactivity`,
             })
