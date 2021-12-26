@@ -1,4 +1,4 @@
-import {AudioPlayerStatus, joinVoiceChannel, VoiceConnection} from "@discordjs/voice"
+import {AudioPlayerStatus, DiscordGatewayAdapterCreator, joinVoiceChannel, VoiceConnection} from "@discordjs/voice"
 import Audio from "./audio";
 import Queue from "./queue";
 import {ButtonInteraction, CommandInteraction, GuildMember, Message} from "discord.js";
@@ -126,7 +126,7 @@ export default class MusicController {
                 joinVoiceChannel({
                     channelId: channel.id,
                     guildId: channel.guild.id,
-                    adapterCreator: channel.guild.voiceAdapterCreator
+                    adapterCreator: channel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator
                 }),
                 channel.guildId,
                 message
