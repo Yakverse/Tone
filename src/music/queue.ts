@@ -46,7 +46,8 @@ export default class Queue {
     }
 
     addAudio(audio: Audio){
-        this.queueTime += Utils.parseISOToSeconds(audio.info.length);
+        if (!audio.info.length) App.logger.send(LogTypeEnum.ERROR, audio.info);
+        else this.queueTime += Utils.parseISOToSeconds(audio.info.length);
 
         this.audios.push(audio);
     }

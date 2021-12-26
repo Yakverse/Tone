@@ -6,7 +6,9 @@ export default class Logger {
     private logging: boolean = environment.log
     private URL: string = 'https://log-api.newrelic.com/log/v1'
 
-    async send(logType: string, message: string): Promise<void>{
+    async send(logType: string, message: string | object): Promise<void>{
+        if (typeof message != 'string') message = JSON.stringify(message)
+
         if (!this.logging) {
             console.log(`${logType}: ${message}`)
             return
