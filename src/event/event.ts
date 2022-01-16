@@ -1,6 +1,5 @@
 import { ButtonInteraction, Client, CommandInteraction, Guild, Interaction, Message, VoiceState } from "discord.js";
 import { CommandFactory } from "../commands/commandFactory";
-import { environment } from "../environments/environment";
 import BotError from "../errors/botError";
 import { ErrorEmbed } from "../embeds/errorEmbed";
 import App from "../main";
@@ -10,6 +9,7 @@ import {Embed} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import { Command } from "../commands/command";
 import SucessEmbed from "../embeds/sucessEmbed";
+import { BOT } from "../utils/constants";
 
 export class Event {
 
@@ -27,10 +27,10 @@ export class Event {
     onMessage(message: Message): void {
         if (message.author.bot) return
 
-        if (message.content.startsWith(environment.prefix)){
+        if (message.content.startsWith(BOT.PREFIX)) {
             let args: Array<string> = message.content.split(" ")
 
-            let command: string = args[0].split(environment.prefix)[1]
+            let command: string = args[0].split(BOT.PREFIX)[1]
             if (!command) return
             command = command.toLowerCase()
 
@@ -89,7 +89,7 @@ export class Event {
             for (const channel of guild.channels.cache.values()) {
                 if (channel.isText())
                     if (channel.permissionsFor(guild.me!).has('SEND_MESSAGES')) {
-                        channel.send({ embeds: [new SucessEmbed(`Hello, I'm ${App.bot.client.user?.username}! You can use ${environment.prefix}help to see my commands 😉`).build()] })
+                        channel.send({ embeds: [new SucessEmbed(`Hello, I'm ${App.bot.client.user?.username}! You can use ${BOT.PREFIX}help to see my commands 😉`).build()] })
                         break
                     }
             }

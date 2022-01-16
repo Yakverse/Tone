@@ -1,7 +1,8 @@
 import {Command} from "./command";
 import {CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed} from "discord.js";
-import {environment} from "../environments/environment";
 import {ColorsEnum} from "../enumerations/Colors.enum";
+import { BOT } from "../utils/constants";
+import { CommandPropertiesInterface } from "../interfaces/CommandProperties.interface";
 
 export default class Invite implements Command{
 
@@ -15,7 +16,7 @@ export default class Invite implements Command{
         const row = new MessageActionRow()
             .addComponents(
                 new MessageButton()
-                    .setURL(environment.inviteURL)
+                    .setURL(BOT.INVITE_URL)
                     .setEmoji("✉")
                     .setStyle('LINK')
             );
@@ -24,7 +25,7 @@ export default class Invite implements Command{
             .setColor(ColorsEnum.WHITE)
             .setTitle('**Invite Me**')
             .setImage('https://imgur.com/l9e0S1s.jpg')
-            .setURL(environment.inviteURL)
+            .setURL(BOT.INVITE_URL)
 
         message.reply({ components: [row], embeds: [embed] });
     }

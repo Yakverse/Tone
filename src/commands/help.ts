@@ -1,9 +1,10 @@
 import {CommandInteraction, Message} from "discord.js";
-import {environment} from "../environments/environment";
 import {Embed} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import {Command} from "./command";
 import App from "../main";
+import { BOT } from "../utils/constants";
+import { CommandPropertiesInterface } from "../interfaces/CommandProperties.interface";
 
 export default class Help implements Command{
 
@@ -20,7 +21,7 @@ export default class Help implements Command{
             fields += `${command.properties.name} | ${command.properties.description}\n`
         }
 
-        let embed = Embed.create(`Commands\nprefix: ${environment.prefix}\n\n${fields}`, ColorsEnum.GRAY)
+        let embed = Embed.create(`Commands\nprefix: ${BOT.PREFIX}\n\n${fields}`, ColorsEnum.GRAY)
         message.reply({embeds:[embed.build()]})
     }
 

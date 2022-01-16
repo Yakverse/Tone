@@ -6,6 +6,7 @@ import Utils from "../utils/utils";
 import BotNotInAVoiceChannel from "../errors/botNotInAVoiceChannel";
 import NoTracksInQueue from "../errors/NoTracksInQueue";
 import {VideoInfo} from "../dto/SearchInfoDTO";
+import { CommandPropertiesInterface } from "../interfaces/CommandProperties.interface";
 
 export default class QueueCommand extends MusicCommand implements Command {
 

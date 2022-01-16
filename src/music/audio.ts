@@ -2,8 +2,8 @@ import {AudioResource, createAudioResource, demuxProbe, ProbeInfo} from "@discor
 import ytdl from 'ytdl-core';
 import { VideoInfo } from "../dto/SearchInfoDTO";
 import { LogTypeEnum } from "../enumerations/logType.enum";
-import { environment } from "../environments/environment";
 import App from "../main";
+import { PLAYER } from "../utils/constants";
 const scdl = require('soundcloud-downloader').default;
 
 export default class Audio {
@@ -28,7 +28,7 @@ export default class Audio {
                         highWaterMark: 1 << 25,
                         requestOptions: {
                             headers: {
-                                cookie: environment.cookie
+                                cookie: PLAYER.COOKIE
                             }
                         }
                     })

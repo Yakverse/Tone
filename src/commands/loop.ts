@@ -3,6 +3,7 @@ import {CommandInteraction, GuildMember, Message} from "discord.js";
 import MusicCommand from "./musicCommand";
 import SucessEmbed from "../embeds/sucessEmbed";
 import {typeSlashCommand} from "../enumerations/typeSlashCommand.enum";
+import { CommandPropertiesInterface } from "../interfaces/CommandProperties.interface";
 
 export default class Loop extends MusicCommand implements Command {
 

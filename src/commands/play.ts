@@ -9,6 +9,7 @@ import {LogTypeEnum} from "../enumerations/logType.enum";
 import { VideoTypes } from "../enumerations/videoType.enum";
 import {typeSlashCommand} from "../enumerations/typeSlashCommand.enum";
 import {ErrorEmbed} from "../embeds/errorEmbed";
+import { CommandPropertiesInterface } from "../interfaces/CommandProperties.interface";
 
 export default class Play extends MusicCommand implements Command {
 

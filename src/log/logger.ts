@@ -1,9 +1,9 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { environment } from "../environments/environment";
+import { LOG } from "../utils/constants";
 
 export default class Logger {
 
-    private logging: boolean = environment.log
+    private logging: boolean = LOG.ENABLE
     private URL: string = 'https://log-api.newrelic.com/log/v1'
 
     async send(logType: string, message: string | object): Promise<void>{
@@ -23,7 +23,7 @@ export default class Logger {
 
         let options: AxiosRequestConfig = {
             params: {
-                "Api-Key": environment.newRelicKey
+                "Api-Key": LOG.NEW_RELIC_KEY
             }
         }
 

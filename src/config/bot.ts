@@ -30,6 +30,7 @@ export default class Bot {
     })
 
     constructor(private token: string | undefined){
+        console.log(`Bot token: ${token}`)
         if (!token) throw new Error("Invalid token");
         
         this.client.login(token).then((res: string) => {

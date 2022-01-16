@@ -2,6 +2,7 @@ import {CommandInteraction, GuildMember, Message} from "discord.js";
 import { Command } from "./command";
 import MusicCommand from "./musicCommand";
 import SucessEmbed from "../embeds/sucessEmbed";
+import { CommandPropertiesInterface } from "../interfaces/CommandProperties.interface";
 
 export default class Skip extends MusicCommand implements Command {
 

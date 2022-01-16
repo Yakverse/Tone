@@ -1,4 +1,4 @@
-interface CommandPropertiesInterface{
+export interface CommandPropertiesInterface{
     readonly name: string
     readonly description: string
     readonly options?: Array<any>

@@ -3,6 +3,7 @@ import { Command } from "./command";
 import {Embed, Field} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import App from "../main";
+import { CommandPropertiesInterface } from "../interfaces/CommandProperties.interface";
 
 export default class Ping implements Command {
 

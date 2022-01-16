@@ -2,6 +2,7 @@ import {Command} from "./command";
 import {CommandInteraction, Message} from "discord.js";
 import MusicCommand from "./musicCommand";
 import SucessEmbed from "../embeds/sucessEmbed";
+import { CommandPropertiesInterface } from "../interfaces/CommandProperties.interface";
 
 export default class Join extends MusicCommand implements Command{
 
