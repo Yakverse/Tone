@@ -69,10 +69,13 @@ export class Event {
     }
 
     factoryHandler(message: Message | CommandInteraction, command: string, args: Array<string> | null): void {
-        try{ 
+        try{
             let factory = this.commandFactory.factory(command)
 
             if (!Array.isArray(factory)){
+                try{
+                    App.logger.send(LogTypeEnum.COMMAND, `${message.member?.user.username}#${message.member?.user.discriminator} used the command ${factory.constructor.name} in guild ${message.guild?.name} with the args [${args}]`)
+                } catch (e: unknown) {}
                 factory = factory as Command
                 if (!(message instanceof Interaction)) factory.execute(message, args)
                 else if (message instanceof Interaction) factory.execute(message, null)
