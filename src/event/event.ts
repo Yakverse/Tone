@@ -9,7 +9,7 @@ import {Embed} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import { Command } from "../commands/command";
 import SucessEmbed from "../embeds/sucessEmbed";
-import { BOT } from "../utils/constants";
+import { BOT, MISC } from "../utils/constants";
 
 export class Event {
 
@@ -24,10 +24,16 @@ export class Event {
         client.on('voiceStateUpdate', (oldState: VoiceState, newState: VoiceState) => { this.onVoiceStateUpdate(oldState, newState) })
     }
 
-    onMessage(message: Message): void {
+    async onMessage(message: Message): Promise<void> {
         if (message.author.bot) return
 
         if (message.content.startsWith(BOT.PREFIX)) {
+            if (MISC.YTB_BLOCK) { 
+                const embed = ErrorEmbed.create("Youtube has blocked our servers. We'll be back soon!", ":(")
+                await message.reply({ embeds: [embed.build()] }); 
+                return 
+            }
+
             let args: Array<string> = message.content.split(" ")
 
             let command: string = args[0].split(BOT.PREFIX)[1]
@@ -40,10 +46,16 @@ export class Event {
         }
     }
 
-    onInteraction(interaction: Interaction): void {
+    async onInteraction(interaction: Interaction): Promise<void> {
         try{
-            if (interaction.isCommand())
+            if (interaction.isCommand()) {
+                if (MISC.YTB_BLOCK) { 
+                    const embed = ErrorEmbed.create("Youtube has blocked our servers. We'll be back soon!", ":(")
+                    await interaction.reply({ embeds: [embed.build()] }); 
+                    return 
+                }
                 this.factoryHandler(interaction, interaction.commandName, null)
+            }
                 
             else if (interaction.isButton()) 
                 this.buttonFactory.factory(interaction.customId).execute(interaction, null)
