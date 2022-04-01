@@ -15,5 +15,5 @@ export const PLAYER = {
 }
 
 export const MISC = {
-    YTB_BLOCK: process.env.YTB_BLOCK || false
+    YTB_BLOCK: process.env.YTB_BLOCK == "true" ? true : false
 }
