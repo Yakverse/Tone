@@ -8,7 +8,7 @@
     "build": "tsc && npm run build:js",
     "build:js": "babel src --out-dir dist --copy-files --extensions \".ts,.tsx\" --source-maps inline",
     "start:prod": "npm run build && cross-env NODE_ENV=production node ./dist/main.js",
-    "start:dev": "npm run build && cross-env NODE_ENV=development tsc-watch --onSuccess \"node ./dist/main.js --use_strict\""
+    "start:dev": "cross-env NODE_ENV=development ts-node-dev -r tsconfig-paths/register --respawn --transpile-only --ignore-watch node_modules --no-notify ./src/main.ts"
   },
   "keywords": [],
   "author": "",
@@ -32,12 +32,14 @@
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.4.0",
     "dotenv-flow": "^3.2.0",
+    "https-proxy-agent": "^5.0.0",
     "libsodium-wrappers": "^0.7.9",
     "play-dl": "^1.2.9",
     "rimraf": "^3.0.2",
     "soundcloud-downloader": "^1.0.0",
     "spdl-core": "^2.0.2",
-    "tsc-watch": "^4.5.0",
+    "ts-node-dev": "^1.1.8",
+    "tsconfig-paths": "^3.14.1",
     "youtube-search-api": "^1.0.10",
     "ytdl-core": "^4.9.2"
   }

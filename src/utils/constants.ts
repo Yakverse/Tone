@@ -13,3 +13,7 @@ export const PLAYER = {
     COOKIE: process.env.COOKIE || '',
     PLAYLIST_LIMIT: parseInt(process.env.PLAYLIST_LIMIT || '0', 10),
 }
+
+export const MISC = {
+    YTB_BLOCK: process.env.YTB_BLOCK == "true" ? true : false
+}
