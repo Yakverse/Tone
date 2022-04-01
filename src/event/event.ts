@@ -24,16 +24,10 @@ export class Event {
         client.on('voiceStateUpdate', (oldState: VoiceState, newState: VoiceState) => { this.onVoiceStateUpdate(oldState, newState) })
     }
 
-    async onMessage(message: Message): Promise<void> {
+    onMessage(message: Message): void {
         if (message.author.bot) return
 
         if (message.content.startsWith(BOT.PREFIX)) {
-            if (MISC.YTB_BLOCK) { 
-                const embed = ErrorEmbed.create("Youtube has blocked our servers. We'll be back soon!", ":(")
-                await message.reply({ embeds: [embed.build()] }); 
-                return 
-            }
-
             let args: Array<string> = message.content.split(" ")
 
             let command: string = args[0].split(BOT.PREFIX)[1]
@@ -46,14 +40,9 @@ export class Event {
         }
     }
 
-    async onInteraction(interaction: Interaction): Promise<void> {
+    onInteraction(interaction: Interaction): void {
         try{
             if (interaction.isCommand()) {
-                if (MISC.YTB_BLOCK) { 
-                    const embed = ErrorEmbed.create("Youtube has blocked our servers. We'll be back soon!", ":(")
-                    await interaction.reply({ embeds: [embed.build()] }); 
-                    return 
-                }
                 this.factoryHandler(interaction, interaction.commandName, null)
             }
                 
@@ -68,13 +57,18 @@ export class Event {
         }
     }
 
-    factoryHandler(message: Message | CommandInteraction, command: string, args: Array<string> | null): void {
+    async factoryHandler(message: Message | CommandInteraction, command: string, args: Array<string> | null): Promise<void> {
         try{
             let factory = this.commandFactory.factory(command)
 
             if (!Array.isArray(factory)){
                 try{
                     App.logger.send(LogTypeEnum.COMMAND, `${message.member?.user.username}#${message.member?.user.discriminator} used the command ${factory.constructor.name} in guild ${message.guild?.name} with the args [${args}]`)
+                    if (MISC.YTB_BLOCK) { 
+                        const embed = ErrorEmbed.create("Youtube has blocked our servers. We'll be back soon!", ":(")
+                        await message.reply({ embeds: [embed.build()] }); 
+                        return 
+                    }
                 } catch (e: unknown) {}
                 factory = factory as Command
                 if (!(message instanceof Interaction)) factory.execute(message, args)
