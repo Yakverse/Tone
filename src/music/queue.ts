@@ -8,7 +8,7 @@ import MusicAlreadyPlaying from "../errors/MusicAlreadyPlaying";
 import App from "../main";
 import {LogTypeEnum} from "../enumerations/logType.enum";
 import Utils from "../utils/utils";
-import { ErrorEmbed } from "src/embeds/errorEmbed";
+import { ErrorEmbed } from "../embeds/errorEmbed";
 
 export default class Queue {
 
