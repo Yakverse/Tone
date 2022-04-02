@@ -3,57 +3,73 @@ import ytdl from 'ytdl-core';
 import { VideoInfo } from "../dto/SearchInfoDTO";
 import { LogTypeEnum } from "../enumerations/logType.enum";
 import App from "../main";
-import { PLAYER } from "../utils/constants";
+import { MISC, PLAYER } from "../utils/constants";
 const scdl = require('soundcloud-downloader').default;
+import { Readable } from 'stream';
 
 export default class Audio {
 
-    constructor(public info: VideoInfo) {}
+    private retries: number = MISC.RETRIES
+
+    constructor(public info: VideoInfo) {
+        this.retries = MISC.RETRIES
+    }
 
     async createAudio(): Promise<AudioResource<Audio>>{
         return new Promise(async (resolve, reject) => {
             try{
-                let originalStream
+                let stream: ProbeInfo | void
 
-                if (this.info.type === 'soundcloud'){
-                    originalStream = await scdl.downloadFormat(this.info.url, scdl.FORMATS.OPUS)
+                while (this.retries) {
+                    stream = await this.createStream().catch(_ => {})
+                    if (stream) break
 
-                }
-                else {
-                    let url: string = this.info.url
-                    originalStream = ytdl(url, {
-                        quality: 'highestaudio',
-                        filter: 'audioonly',
-                        dlChunkSize: 0,
-                        highWaterMark: 1 << 25,
-                        requestOptions: {
-                            headers: {
-                                cookie: PLAYER.COOKIE
-                            }
-                        }
-                    })
+                    this.retries--
                 }
 
-                const stream: ProbeInfo | void = await demuxProbe(originalStream).catch((e) => {
-                    App.logger.send(LogTypeEnum.ERROR, `Stream Error: ${e}`)
-                })
+                this.retries = MISC.RETRIES
 
-                if (stream){
+                if (stream) {
                     resolve(createAudioResource(stream.stream, { metadata: this, inputType: stream.type }))
                 } else {
+                    MISC.YTB_BLOCK = true
                     setTimeout(() => {
-                        resolve(this.createAudio())
-                    }, 1000)
+                        MISC.YTB_BLOCK = false
+                    }, 60 * 60 * 1000) // 1h
+
+                    reject()
                 }
 
-
-
             } catch(e) {
-                console.log(e)
                 App.logger.send(LogTypeEnum.ERROR, `Stream Error: ${e}`)
                 reject('Error loading music, this song is probably age restricted')
             }
         })
+
+    }
+
+    private async createStream(): Promise<ProbeInfo | void> {
+        let originalStream: Readable
+
+        if (this.info.type === 'soundcloud'){
+            originalStream = await scdl.downloadFormat(this.info.url, scdl.FORMATS.OPUS)
+            
+        } else {
+            let url: string = this.info.url
+            originalStream = ytdl(url, {
+                quality: 'highestaudio',
+                filter: 'audioonly',
+                dlChunkSize: 0,
+                highWaterMark: 1 << 25,
+                requestOptions: {
+                    headers: {
+                        cookie: PLAYER.COOKIE
+                    }
+                }
+            })
+        }
+
+        return await demuxProbe(originalStream)
     }
 
 }
