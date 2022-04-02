@@ -8,6 +8,7 @@ import MusicAlreadyPlaying from "../errors/MusicAlreadyPlaying";
 import App from "../main";
 import {LogTypeEnum} from "../enumerations/logType.enum";
 import Utils from "../utils/utils";
+import { ErrorEmbed } from "src/embeds/errorEmbed";
 
 export default class Queue {
 
@@ -145,7 +146,12 @@ export default class Queue {
     }
 
     private async playAudio(audio: Audio){
-        const audioResource: AudioResource<Audio> = await audio.createAudio()
+        const audioResource: AudioResource<Audio> | void  = await audio.createAudio().catch(async _ => {
+            const embed = ErrorEmbed.create("Youtube has blocked our servers. We'll be back soon!", ":(")
+            if (this.message && this.message instanceof Message) await this.message.edit({ embeds: [embed.build()] })
+            else if (this.message) await this.message.editReply({ embeds: [embed.build()] })
+        })
+        if (!audioResource) return
         App.InactivityHandler.deleteNoMusicTimeout(this.message.guild!.id)
         this.audioPlayer.play(audioResource)
 

@@ -15,5 +15,7 @@ export const PLAYER = {
 }
 
 export const MISC = {
-    YTB_BLOCK: process.env.YTB_BLOCK == "true" ? true : false
+    YTB_BLOCK: process.env.YTB_BLOCK == "true" ? true : false,
+    RETRIES: isNaN(process.env.RETRIES as any) ? 5 : process.env.RETRIES as any,
+    TIMEOUT_RATE_LIMIT: isNaN(process.env.TIMEOUT_RATE_LIMIT as any) ? 60 * 60 * 1000 : process.env.TIMEOUT_RATE_LIMIT as any, //1h
 }
