@@ -31,6 +31,7 @@ export default class Audio {
                     resolve(createAudioResource(stream.stream, { metadata: this, inputType: stream.type }))
                 } else {
                     MISC.YTB_BLOCK = true
+                    App.logger.send(LogTypeEnum.ERROR, 'Youtube block set to true')
                     setTimeout(() => {
                         MISC.YTB_BLOCK = false
                     }, 60 * 60 * 1000) // 1h

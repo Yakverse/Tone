@@ -81,7 +81,7 @@ export default class MusicSearch {
         }
         else {
             let searchDTO = await youtubesearchapi.GetListByKeyword(query, true)
-            searchDTO.items = searchDTO.items.filter((item: any) => item.type === 'video' || item.type === 'playlist')
+            searchDTO.items = searchDTO.items.filter((item: any) => item.type === VideoTypes.YOUTUBE_VIDEO || item.type === VideoTypes.YOUTUBE_PLAYLIST)
 
             if (searchDTO.items.length == 0) 
                 throw new Error("MUSIC_NOT_FOUND")

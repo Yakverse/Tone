@@ -63,7 +63,7 @@ export class Event {
 
             if (!Array.isArray(factory)){
                 try{
-                    App.logger.send(LogTypeEnum.COMMAND, `${message.member?.user.username}#${message.member?.user.discriminator} used the command ${factory.constructor.name} in guild ${message.guild?.name} with the args [${args}]`)
+                    App.logger.send(LogTypeEnum.COMMAND, `${message.member?.user.username}#${message.member?.user.discriminator} used the command ${factory.constructor.name} in guild ${message.guild?.name} with the args ${JSON.stringify(args ? args : (message as CommandInteraction).options.data.map(option => option.value))}`)
                 } catch (e: unknown) {}
                 factory = factory as Command
                 if (!(message instanceof Interaction)) factory.execute(message, args)
