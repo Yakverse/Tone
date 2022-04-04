@@ -9,7 +9,7 @@ import {Embed} from "../embeds/embed";
 import {ColorsEnum} from "../enumerations/Colors.enum";
 import { Command } from "../commands/command";
 import SucessEmbed from "../embeds/sucessEmbed";
-import { BOT, MISC } from "../utils/constants";
+import { BOT } from "../utils/constants";
 
 export class Event {
 
@@ -64,11 +64,6 @@ export class Event {
             if (!Array.isArray(factory)){
                 try{
                     App.logger.send(LogTypeEnum.COMMAND, `${message.member?.user.username}#${message.member?.user.discriminator} used the command ${factory.constructor.name} in guild ${message.guild?.name} with the args [${args}]`)
-                    if (MISC.YTB_BLOCK) { 
-                        const embed = ErrorEmbed.create("Youtube has blocked our servers. We'll be back soon!", ":(")
-                        await message.reply({ embeds: [embed.build()] }); 
-                        return 
-                    }
                 } catch (e: unknown) {}
                 factory = factory as Command
                 if (!(message instanceof Interaction)) factory.execute(message, args)

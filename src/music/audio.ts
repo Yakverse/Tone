@@ -11,9 +11,7 @@ export default class Audio {
 
     private retries: number = MISC.RETRIES
 
-    constructor(public info: VideoInfo) {
-        this.retries = MISC.RETRIES
-    }
+    constructor(public info: VideoInfo) {}
 
     async createAudio(): Promise<AudioResource<Audio>>{
         return new Promise(async (resolve, reject) => {
@@ -55,8 +53,7 @@ export default class Audio {
             originalStream = await scdl.downloadFormat(this.info.url, scdl.FORMATS.OPUS)
             
         } else {
-            let url: string = this.info.url
-            originalStream = ytdl(url, {
+            originalStream = ytdl(this.info.url, {
                 quality: 'highestaudio',
                 filter: 'audioonly',
                 dlChunkSize: 0,
@@ -65,7 +62,8 @@ export default class Audio {
                     headers: {
                         cookie: PLAYER.COOKIE
                     }
-                }
+                },
+                // IPv6Block: '2001:2::/48' // Force Stream Errors for debugging
             })
         }
 

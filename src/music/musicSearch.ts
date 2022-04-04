@@ -1,10 +1,8 @@
 import { SearchInfoDTO, VideoInfo } from "../dto/SearchInfoDTO";
-import NoMusicFound from "../errors/NoMusicFound";
 import ytdl from 'ytdl-core';
 import Utils from "../utils/utils";
 import { VideoTypes } from "../enumerations/videoType.enum";
-import PlaylistLimit from "../errors/PlaylistLimit";
-import { PLAYER } from "../utils/constants";
+import { MISC, PLAYER } from "../utils/constants";
 const youtubesearchapi = require('youtube-search-api');
 const scdl = require('soundcloud-downloader').default;
 const ytfps = require('@maroxy/ytfps');
@@ -21,7 +19,7 @@ export default class MusicSearch {
             case (spdl.validateURL(query, 'track')):
                 return this.spotifySearch(query);
             case (spdl.validateURL(query, 'playlist') || spdl.validateURL(query, 'album')):
-                throw new Error('Playlist and Albums are not supported yet');
+                throw new Error('PLAYLIST_ALBUM_NOT_SUPPORTED');
             default:
                 return this.youtubeSearch(query);
         }
@@ -30,7 +28,7 @@ export default class MusicSearch {
     private static async soundcloudSearch(query: string): Promise<SearchInfoDTO> {
         const info = await scdl.getInfo(query)
         if (info.response)
-            throw new NoMusicFound()
+            throw new Error("MUSIC_NOT_FOUND")
 
         let time = new Date(info.duration).toISOString().slice(11, -5)
         if (time.slice(0, 2) == '00') time = time.slice(3)
@@ -61,6 +59,9 @@ export default class MusicSearch {
     }
 
     private static async youtubeSearch(query: string): Promise<SearchInfoDTO>{
+        if (MISC.YTB_BLOCK) 
+            throw new Error("YOUTUBE_BLOCK")
+
         if (ytdl.validateURL(query)){
             const res = await ytdl.getBasicInfo(query, {
                 requestOptions: {
@@ -81,7 +82,7 @@ export default class MusicSearch {
         else {
             let searchDTO = await youtubesearchapi.GetListByKeyword(query, true)
             if (searchDTO.items.length == 0) 
-                throw new NoMusicFound()
+                throw new Error("MUSIC_NOT_FOUND")
 
             let item = searchDTO.items[0]
             if (item.type === VideoTypes.YOUTUBE_VIDEO) {
@@ -96,7 +97,7 @@ export default class MusicSearch {
             } else if (item.type === VideoTypes.YOUTUBE_PLAYLIST) {
 
                 if (searchDTO.items[0].videoCount > PLAYER.PLAYLIST_LIMIT) 
-                    throw new PlaylistLimit()
+                    throw new Error("PLAYLIST_LIMIT")
 
                 let playlist = await ytfps(searchDTO.items[0].id)
                 let videos: VideoInfo[] = []
@@ -123,6 +124,6 @@ export default class MusicSearch {
                 }
             }
         }
-        throw new NoMusicFound()
+        throw new Error("MUSIC_NOT_FOUND")
     }
 }

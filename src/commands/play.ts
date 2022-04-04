@@ -52,7 +52,21 @@ export default class Play extends MusicCommand implements Command {
             await message.reply({embeds: [searchEmbed.build()]})
 
         const info = await MusicSearch.search(url[0]).catch(async error => {
-            let embed = ErrorEmbed.create(error.message)
+
+            let embed: Embed
+            switch(error.message) {
+                case "MUSIC_NOT_FOUND":
+                    embed = ErrorEmbed.create('**Music not found**'); break;
+                case "PLAYLIST_ALBUM_NOT_SUPPORTED":
+                    embed = ErrorEmbed.create('**Playlist and Albums are not supported yet**'); break;
+                case "PLAYLIST_LIMIT":
+                    embed = ErrorEmbed.create('**Playlist limit reached**'); break;
+                case "YOUTUBE_BLOCK":
+                    embed = ErrorEmbed.create("**Youtube has blocked our servers (we can't play music from Spotify either).\n\n We'll be back soon!**"); break;
+                default:
+                    embed = ErrorEmbed.create("There was an error searching for this song. It may be blocked in some countries or age restricted.")
+            }
+
             App.logger.send(LogTypeEnum.ERROR, `${error}`)
             if (!(message instanceof CommandInteraction)) 
                 await message.edit({embeds:[embed.build()]})
