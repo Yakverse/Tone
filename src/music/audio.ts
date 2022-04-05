@@ -34,6 +34,7 @@ export default class Audio {
                     App.logger.send(LogTypeEnum.ERROR, 'Youtube block set to true')
                     setTimeout(() => {
                         MISC.YTB_BLOCK = false
+                        App.logger.send(LogTypeEnum.ERROR, 'Youtube block set to false')
                     }, 60 * 60 * 1000) // 1h
 
                     reject()
