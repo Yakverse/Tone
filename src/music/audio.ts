@@ -19,7 +19,7 @@ export default class Audio {
                 let stream: ProbeInfo | void
 
                 while (this.retries) {
-                    stream = await this.createStream().catch(_ => {})
+                    stream = await this.createStream().catch(error => {App.logger.send(LogTypeEnum.ERROR, `${error}`)})
                     if (stream) break
 
                     this.retries--
