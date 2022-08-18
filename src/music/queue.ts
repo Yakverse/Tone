@@ -22,7 +22,7 @@ export default class Queue {
     constructor(public voiceConnection: VoiceConnection, public message: Message | CommandInteraction ) {}
 
     addListener(){
-        this.audioPlayer.on('stateChange', async (oldState, newState) => {
+        this.audioPlayer.on('stateChange' as AudioPlayerStatus.Idle /*????*/, async (oldState, newState) => {
             if (newState.status === AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) {
                 if (oldState.status != AudioPlayerStatus.Buffering) {
                     await this.processQueue()

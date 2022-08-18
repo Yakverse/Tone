@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@discordjs/builders": "^0.10.0",
-    "@discordjs/opus": "^0.7.0",
+    "@discordjs/opus": "^0.8.0",
     "@discordjs/rest": "^0.1.0-canary.0",
     "@discordjs/voice": "^0.7.4",
     "@maroxy/ytfps": "^1.0.6",
@@ -41,6 +41,6 @@
     "ts-node-dev": "^1.1.8",
     "tsconfig-paths": "^3.14.1",
     "youtube-search-api": "^1.0.10",
-    "ytdl-core": "^4.9.2"
+    "ytdl-core": "4.10.0"
   }
 }
