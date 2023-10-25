@@ -1,43 +1,29 @@
-import {Command} from "./command";
-import {CommandInteraction, GuildMember, Message} from "discord.js";
-import MusicCommand from "./musicCommand";
-import SucessEmbed from "../embeds/sucessEmbed";
-import {typeSlashCommand} from "../enumerations/typeSlashCommand.enum";
-import { CommandPropertiesInterface } from "../interfaces/CommandProperties.interface";
+import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { ColorsEnum } from "@/enumerations/colors.enum";
+import musicController from "@/music/musicController";
 
-export default class Loop extends MusicCommand implements Command {
-
-    static properties: CommandPropertiesInterface = {
-        name: 'loop',
-        description: 'loop the song',
-        options: [
-            {
-                name: 'number',
-                type: typeSlashCommand.INTEGER,
-                description: 'Number of times the queue will repeat',
-                required: false
-            }
-        ],
-        aliases: ['loop']
-    }
-
-    execute(message: Message | CommandInteraction, args: Array<string>) {
-        if(message.member instanceof GuildMember){
-            this.musicController.isInSameVoiceChannel(message);
-            if (message instanceof Message) {
-                if (parseInt(args[0])) this.musicController.loop(message, parseInt(args[0]));
-                else this.musicController.loop(message, undefined);
-            }
-            else if (message.options.get('song')) {
-                let number: number | undefined;
-                if (!message.options.get('number')) number = undefined;
-                else number = message.options.get('number')!.value as number;
-
-                this.musicController.loop(message, number);
-            }
-            message.reply({embeds:[SucessEmbed.create("Looping!").build()]});
+export default {
+    data: new SlashCommandBuilder()
+        .setName('loop')
+        .setDescription('loop the song')
+        .addIntegerOption(option => option.setName('number').setDescription('Number of times the queue will repeat').setRequired(false)),
+    async execute(interaction: CommandInteraction) {
+        
+        try {
+            musicController.loop(interaction)
+        } catch(err: any) {
+            const embed = new EmbedBuilder()
+                .setTitle(`**${err.message}**`)
+                .setColor(ColorsEnum.RED)
+            
+            return await interaction.reply({embeds: [embed], ephemeral: true})
         }
+
+        const embed = new EmbedBuilder()
+            .setTitle("**Looping!**")
+            .setColor(ColorsEnum.GREEN)
+
+        await interaction.reply({embeds: [embed]})
+
     }
 }
-
-

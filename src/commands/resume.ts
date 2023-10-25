@@ -1,21 +1,28 @@
-import {CommandInteraction, GuildMember, Message} from "discord.js";
-import { Command } from "./command";
-import MusicCommand from "./musicCommand";
-import SucessEmbed from "../embeds/sucessEmbed";
-import { CommandPropertiesInterface } from "../interfaces/CommandProperties.interface";
+import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { ColorsEnum } from "@/enumerations/colors.enum";
+import musicController from "@/music/musicController";
 
-export default class Pause extends MusicCommand implements Command {
+export default {
+    data: new SlashCommandBuilder()
+        .setName('resume')
+        .setDescription('resume the song'),
+    async execute(interaction: CommandInteraction) {
 
-    static properties: CommandPropertiesInterface = {
-        name: 'resume',
-        description: 'Resume the song',
-        aliases: ['resume']
-    }
-
-    execute(message: Message | CommandInteraction) {
-        if(message.member instanceof GuildMember){
-            this.musicController.resume(message);
-            message.reply({embeds:[SucessEmbed.create("Resume ⏯").build()]});
+        try {
+            musicController.resume(interaction)
+        } catch(err: any) {
+            const embed = new EmbedBuilder()
+                .setTitle(`**${err.message}**`)
+                .setColor(ColorsEnum.RED)
+            
+            return await interaction.reply({embeds: [embed], ephemeral: true})
         }
+
+        const embed = new EmbedBuilder()
+            .setTitle("**Resume**")
+            .setColor(ColorsEnum.GREEN)
+
+        await interaction.reply({embeds: [embed]})
+
     }
 }

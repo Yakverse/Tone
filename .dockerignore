@@ -1,0 +1,8 @@
+node_modules
+dist
+example.env
+LICENSE
+README.md
+Dockerfile
+Dockerfile.production
+docker-compose.yml

@@ -1,165 +1,142 @@
-import {AudioPlayerStatus, DiscordGatewayAdapterCreator, joinVoiceChannel, VoiceConnection} from "@discordjs/voice"
-import Audio from "./audio";
-import Queue from "./queue";
-import {ButtonInteraction, CommandInteraction, GuildMember, Message} from "discord.js";
-import UserNotInAVoiceChannel from "../errors/userNotInAVoiceChannel";
-import BotNotInAVoiceChannel from "../errors/botNotInAVoiceChannel";
-import UserInWrongChannel from "../errors/userInWrongChannel";
-import {SearchInfoDTO} from "../dto/SearchInfoDTO";
-import {VideoTypes} from "../enumerations/videoType.enum";
-import NoTracksToSkip from "../errors/noTracksToSkip";
-import BotIsProcessingError from "../errors/BotIsProcessingError";
-import App from "../main";
-import BotError from "../errors/botError";
+import { joinVoiceChannel} from "@discordjs/voice"
+import { CommandInteraction, GuildMember } from "discord.js"
+import Utils from "@/utils/utils";
+import Guild from "./guildService";
 
-export default class MusicController {
+const GUILDS: Map<string, Guild> = new Map<string, Guild>()
 
-    guilds: Map<string, Queue> = new Map<string, Queue>();
+export default {
+    userIsOnAVoiceChannel(interaction: CommandInteraction) {
+        if (!(interaction.member instanceof GuildMember) || !interaction.member!.voice.channel) throw new Error('You are not in a voice channel')
+    },
 
-    getQueue(guildId: string): Queue{
-        const queue: Queue | undefined = this.guilds.get(guildId)
-        if (queue) return queue;
-        throw new BotNotInAVoiceChannel();
-    }
+    userIsOnOtherVoiceChannel(interaction: CommandInteraction) {
+        const guild = GUILDS.get(interaction.guild!.id)
+        if (guild && guild.voiceConnection.joinConfig.channelId !== (interaction.member! as GuildMember).voice.channel!.id) 
+            throw new Error("Sorry, I'm in OTHER channel with OTHER friends now")
+    },
 
-    getOptionalQueue(guildId: string): Queue | undefined{
-        const queue: Queue | undefined = this.guilds.get(guildId)
-        if (queue) return queue;
-        return undefined
-    }
+    botIsOnAVoiceChannel(guildId: string) {
+        const guild = GUILDS.get(guildId)
+        if (!guild) throw new Error('I am not in a voice channel')
+    },
 
-    configGuildQueue(voiceConnection: VoiceConnection, guildId: string, message: Message | CommandInteraction): Queue {
+    thereIsSongPlaying(guild: Guild) {
+        if (guild.audioPlayer.state.status === "idle") throw new Error("There is no song playing")
+    },
 
-        let queue: Queue | undefined = this.guilds.get(guildId)
-        if (!queue) queue = this.guilds.set(guildId, new Queue(voiceConnection, message)).get(guildId)
+    join(interaction: CommandInteraction) {
+        this.userIsOnAVoiceChannel(interaction)
+        this.userIsOnOtherVoiceChannel(interaction)
 
-        queue!.addListener()
+        if (GUILDS.has(interaction.guildId!)) return
+        
+        const guild = new Guild(
+            joinVoiceChannel({
+                channelId: (interaction.member! as GuildMember).voice.channel!.id,
+                guildId: interaction.guild!.id,
+                adapterCreator: interaction.guild!.voiceAdapterCreator,
+                selfDeaf: true,
+            }),
+            interaction
+        )
+        GUILDS.set(interaction.guildId!, guild)
 
-        return queue!
-    }
+    },
 
-    shuffle(message: Message | CommandInteraction): void {
-        this.isInSameVoiceChannel(message)
-        this.getQueue(message.guildId!).shuffle()
-    }
+    leave(identifier: CommandInteraction | string) {
+        const guildId = identifier instanceof CommandInteraction ? identifier.guild!.id : identifier
+
+        this.botIsOnAVoiceChannel(guildId)
+        if (identifier instanceof CommandInteraction) this.userIsOnOtherVoiceChannel(identifier)
+
+        const guild = GUILDS.get(guildId)
+        
+        guild!.voiceConnection.destroy()
+        GUILDS.delete(guildId)
+    },
+
+    play(interaction: CommandInteraction) {
+
+        this.join(interaction)
+        const guild = GUILDS.get(interaction.guild!.id)!
+        guild.addAudioToQueue(interaction.options.get("song")!.value as string)
+        
+    },
+
+    pause(interaction: CommandInteraction) {
+
+        this.botIsOnAVoiceChannel(interaction.guild!.id)
+        this.userIsOnOtherVoiceChannel(interaction)
+
+        const guild = GUILDS.get(interaction.guild!.id)!
+
+        this.thereIsSongPlaying(guild)
+        if (guild.audioPlayer.state.status === "paused") throw new Error("Your song is already paused")
+
+        guild.audioPlayer.pause()
+    },
+
+    resume(interaction: CommandInteraction) {
+
+        this.botIsOnAVoiceChannel(interaction.guild!.id)
+        this.userIsOnOtherVoiceChannel(interaction)
+
+        const guild = GUILDS.get(interaction.guild!.id)!
+
+        this.thereIsSongPlaying(guild)
+        if (guild.audioPlayer.state.status === "playing") throw new Error("Your song is already playing")
+        
+        guild.audioPlayer.unpause()
+    },
     
-    pause(message: Message | CommandInteraction){
-        this.isInSameVoiceChannel(message)
-        this.getQueue(message.guildId!).pause();
-    }
+    stop(interaction: CommandInteraction) {
+        this.botIsOnAVoiceChannel(interaction.guild!.id)
+        this.userIsOnOtherVoiceChannel(interaction)
+        
+        const guild = GUILDS.get(interaction.guild!.id)!
+        
+        this.thereIsSongPlaying(guild)
 
-    resume(message: Message | CommandInteraction){
-        this.isInSameVoiceChannel(message)
-        this.getQueue(message.guildId!).resume();
-    }
+        guild.destroyQueue()
+    },
 
-    // TODO remove leave from MusicController
-    leave(message: Message | CommandInteraction | null, guildId: string | undefined = undefined){
-        if (message) {
-            this.isInSameVoiceChannel(message)
-            this.getQueue(message.guildId!).leave();
-            this.guilds.delete(message.guildId!);
-        } else if (guildId) {
-            this.getQueue(guildId).leave();
-            this.guilds.delete(guildId);
-        }
-    }
+    skip(interaction: CommandInteraction) {
+        this.botIsOnAVoiceChannel(interaction.guild!.id)
+        this.userIsOnOtherVoiceChannel(interaction)
 
-    leaveAssert(guildId: string){
-        const queue = this.getOptionalQueue(guildId)
-        if (queue) queue.leave()
-        this.guilds.delete(guildId);
-    }
+        const guild = GUILDS.get(interaction.guild!.id)!
+        this.thereIsSongPlaying(guild)
 
-    stop(message: Message | CommandInteraction){
-        this.isInSameVoiceChannel(message)
-        this.getQueue(message.guildId!).stop()
-    }
+        guild.processQueue()
+    },
 
-    skip(message: Message | CommandInteraction){
-        this.isInSameVoiceChannel(message)
-        const queue = this.getQueue(message.guildId!)
+    loop(interaction: CommandInteraction) {
+        this.botIsOnAVoiceChannel(interaction.guild!.id)
+        this.userIsOnOtherVoiceChannel(interaction)
 
-        if(queue.audios.length == 0) throw new NoTracksToSkip();
+        const guild = GUILDS.get(interaction.guild!.id)!
+        const timesToPlay = interaction.options.get("number") ? interaction.options.get("number")!.value as number : Number.MAX_SAFE_INTEGER
+        guild.queue.timesToPlay = timesToPlay
+    },
 
-        if(queue.audioPlayer.state.status === AudioPlayerStatus.Idle) throw new BotIsProcessingError();
+    unloop(interaction: CommandInteraction) {
+        this.botIsOnAVoiceChannel(interaction.guild!.id)
+        this.userIsOnOtherVoiceChannel(interaction)
 
-        queue.skip()
-    }
+        const guild = GUILDS.get(interaction.guild!.id)!
+        guild.queue.timesToPlay = 0
+    },
 
-    async addQueue(guildId: string, videoInfo: SearchInfoDTO, message: Message | null){
-        const queue: Queue = this.getQueue(guildId)
+    shuffle(interaction: CommandInteraction) {
+        this.botIsOnAVoiceChannel(interaction.guild!.id)
+        this.userIsOnOtherVoiceChannel(interaction)
 
-        if (message) queue.message = message
+        const guild = GUILDS.get(interaction.guild!.id)!
 
-        if (videoInfo.type === VideoTypes.YOUTUBE_VIDEO || videoInfo.type === VideoTypes.SOUNDCLOUD || videoInfo.type === VideoTypes.SPOTIFY)
-            queue.addAudio(new Audio(videoInfo));
-        else // For now it's not necessary to check if it's a playlist.
-            for (let video of videoInfo.videos!)
-                queue.addAudio(new Audio(video));
+        const firstArraySlice = guild.queue.audios.slice(0, guild.queue.indexActualAudio + 1)
+        const secondArraySlice = guild.queue.audios.slice(guild.queue.indexActualAudio + 1)
 
-        await queue.processQueue(true);
-    }
-
-    loop(message: Message | CommandInteraction, number: number | undefined){
-        this.isInSameVoiceChannel(message)
-        const queue: Queue = this.getQueue(message.guildId!)
-        if (!queue.actualAudio) return
-        queue.loop(number)
-    }
-
-    unloop(message: Message | CommandInteraction){
-        this.isInSameVoiceChannel(message);
-        const queue: Queue = this.getQueue(message.guildId!)
-        if (!queue.actualAudio) return
-        queue.unloop()
-    }
-
-    join(message: Message | CommandInteraction){
-        this.isInAVoiceChannel(message)
-        if (message.member instanceof GuildMember && message.member.voice.channel) {
-            if (message.guild?.me?.voice.channelId != null && message.guild?.me?.voice.channelId !== message.member.voice.channel.id) {
-                throw new BotError("Sorry, I'm in OTHER channel with OTHER friends now", "Bot in a different channel")
-            }
-            const channel = message.member.voice.channel
-            let queue: Queue | undefined = this.configGuildQueue(
-                joinVoiceChannel({
-                    channelId: channel.id,
-                    guildId: channel.guild.id,
-                    adapterCreator: channel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator
-                }),
-                channel.guildId,
-                message
-            )
-            App.InactivityHandler.createNoMusicTimeout(message.guild!.id, queue)
-        }
-    }
-
-    public isInAVoiceChannel(message: Message | CommandInteraction | ButtonInteraction){
-        if (!(message.member instanceof GuildMember) || !message.member.voice.channel) throw new UserNotInAVoiceChannel();
-    }
-
-    public isInSameVoiceChannel(message: Message | CommandInteraction | ButtonInteraction): void{
-        let track: Queue | undefined = this.guilds.get(message.guildId!);
-
-        if (!(message.member instanceof GuildMember)){
-            // Not in a guild chat
-            return
-        }
-
-        if (!message.member.voice.channel)
-            throw new UserNotInAVoiceChannel();
-
-        if (!track){
-            throw new BotNotInAVoiceChannel();
-        } else {
-            if (!track.voiceConnection) {
-                throw new BotNotInAVoiceChannel();
-            }
-
-            if(track.voiceConnection.joinConfig.channelId != message.member.voice.channel.id){
-                throw new UserInWrongChannel();
-            }
-        }
+        guild.queue.audios = [...firstArraySlice, ...Utils.shuffleArray(secondArraySlice)]
     }
 }

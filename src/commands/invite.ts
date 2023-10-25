@@ -1,32 +1,30 @@
-import {Command} from "./command";
-import {CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed} from "discord.js";
-import {ColorsEnum} from "../enumerations/Colors.enum";
-import { BOT } from "../utils/constants";
-import { CommandPropertiesInterface } from "../interfaces/CommandProperties.interface";
+// export default class Invite implements Command{
 
-export default class Invite implements Command{
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { ColorsEnum } from "@/enumerations/colors.enum";
+import { BOT } from "@/utils/constants";
 
-    static properties: CommandPropertiesInterface = {
-        name: 'invite',
-        description: 'invite me to your discord server',
-        aliases: ['invite']
-    }
+export default {
+    data: new SlashCommandBuilder()
+        .setName('invite')
+        .setDescription('invite me to your discord server'),
+    async execute(interaction: CommandInteraction) {
 
-    execute(message: Message | CommandInteraction) {
-        const row = new MessageActionRow()
-            .addComponents(
-                new MessageButton()
+        const row = new ActionRowBuilder()
+			.addComponents(
+				new ButtonBuilder()
                     .setURL(BOT.INVITE_URL)
                     .setEmoji("✉")
-                    .setStyle('LINK')
-            );
-
-        const embed = new MessageEmbed()
-            .setColor(ColorsEnum.WHITE)
+                    .setStyle(ButtonStyle.Link)
+            )
+        
+        const embed = new EmbedBuilder()
             .setTitle('**Invite Me**')
+            .setColor(ColorsEnum.WHITE)
             .setImage('https://imgur.com/l9e0S1s.jpg')
             .setURL(BOT.INVITE_URL)
 
-        message.reply({ components: [row], embeds: [embed] });
+        await interaction.reply({ embeds: [embed], components: [row as any] });
+
     }
 }

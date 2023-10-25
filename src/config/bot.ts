@@ -1,33 +1,22 @@
-import { Client, Intents } from "discord.js";
-import { Event } from "../event/event";
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
-import * as commands from '../commands'
+import { Client, GatewayIntentBits, ActivityType, Collection } from "discord.js";
+import { Event } from "@/event/event";
+import * as commands from '@/commands'
 
 export default class Bot {
 
     client: Client = new Client({ 
-        intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES],
+        intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates],
         presence: {
             status: 'online',
             activities: [
                 {
-                    name: `good music`,
-                    type: 'LISTENING',
+                    name: 'good music',
+                    type: ActivityType.Listening,
                 }
             ]
         }
     });
     event: Event = new Event(this.client)
-    commands = Object.values(commands)
-    commandName: string[] = this.commands.map(command => command.name)
-    slashCommands = this.commands.map(command => {
-        return {
-            name: command.properties.name,
-            description: command.properties.description,
-            options: command.properties.options
-        }
-    })
 
     constructor(private token: string | undefined){
         console.log(`Bot token: ${token}`)
@@ -37,22 +26,13 @@ export default class Bot {
             console.log('BOT ONLINE');
             console.log(`Total guilds: ${this.client.guilds.cache.size}`)
             
-            if (res === this.token) this.addSlashCommands();
+            if (res === this.token) {
+                this.client.commands = new Collection();
+                for (const command of Object.values(commands)) {
+                    this.client.commands.set(command.data.name, command);
+                }
+            }
             else throw new Error('Login error');         
         })
     }
-    
-    private addSlashCommands(): void{
-        (async () => {
-            if (!this.client.user) throw new Error('User error')
-            
-            const rest = new REST({ version: '9' }).setToken(this.token);
-            await rest.put(
-                Routes.applicationCommands(this.client.user.id),
-                { body: this.slashCommands }
-            ); 
-        })();
-    }
-
-
 }

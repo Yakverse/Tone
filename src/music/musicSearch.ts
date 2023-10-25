@@ -1,8 +1,8 @@
-import { SearchInfoDTO, VideoInfo } from "../dto/SearchInfoDTO";
 import ytdl from 'ytdl-core';
 import Utils from "../utils/utils";
 import { VideoTypes } from "../enumerations/videoType.enum";
 import { MISC, PLAYER } from "../utils/constants";
+import { SearchInfoDTO, VideoInfo } from '@/types/searchInfo';
 const youtubesearchapi = require('youtube-search-api');
 const scdl = require('soundcloud-downloader').default;
 const ytfps = require('@maroxy/ytfps');

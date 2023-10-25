@@ -1,22 +1,28 @@
-import {Command} from "./command";
-import {CommandInteraction, Message} from "discord.js";
-import MusicCommand from "./musicCommand";
-import SucessEmbed from "../embeds/sucessEmbed";
-import { CommandPropertiesInterface } from "../interfaces/CommandProperties.interface";
+import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { ColorsEnum } from "@/enumerations/colors.enum";
+import musicController from "@/music/musicController";
 
-export default class Shuffle extends MusicCommand implements Command{
+export default {
+    data: new SlashCommandBuilder()
+        .setName('shuffle')
+        .setDescription('shuffle the queue'),
+    async execute(interaction: CommandInteraction) {
+        
+        try {
+            musicController.shuffle(interaction)
+        } catch(err: any) {
+            const embed = new EmbedBuilder()
+                .setTitle(`**${err.message}**`)
+                .setColor(ColorsEnum.RED)
+            
+            return await interaction.reply({embeds: [embed], ephemeral: true})
+        }
 
-    static properties: CommandPropertiesInterface = {
-        name: 'shuffle',
-        description: 'shuffle the queue',
-        aliases: ['shuffle']
+        const embed = new EmbedBuilder()
+            .setTitle("**Shuffled! 🤪**")
+            .setColor(ColorsEnum.GREEN)
+
+        await interaction.reply({embeds: [embed]})
+
     }
-
-    execute(message: Message | CommandInteraction): void {
-        this.musicController.shuffle(message)
-        message.reply({embeds: [SucessEmbed.create('Shuffled! 🤪').build()]})
-    }
-
-
-
 }

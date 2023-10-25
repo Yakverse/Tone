@@ -1,21 +1,27 @@
-import {Command} from "./command";
-import {CommandInteraction, GuildMember, Message} from "discord.js";
-import MusicCommand from "./musicCommand";
-import SucessEmbed from "../embeds/sucessEmbed";
-import { CommandPropertiesInterface } from "../interfaces/CommandProperties.interface";
+import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { ColorsEnum } from "@/enumerations/colors.enum";
+import musicController from "@/music/musicController";
+export default {
+    data: new SlashCommandBuilder()
+        .setName('unloop')
+        .setDescription('unloop the song'),
+    async execute(interaction: CommandInteraction) {
 
-export default class Unloop extends MusicCommand implements Command {
-
-    static properties: CommandPropertiesInterface = {
-        name: 'unloop',
-        description: 'unloop the song',
-        aliases: ['unloop']
-    }
-
-    execute(message: Message | CommandInteraction) {
-        if(message.member instanceof GuildMember){
-            this.musicController.unloop(message);
-            message.reply({embeds:[SucessEmbed.create("Unlooped").build()]});
+        try {
+            musicController.unloop(interaction)
+        } catch(err: any) {
+            const embed = new EmbedBuilder()
+                .setTitle(`**${err.message}**`)
+                .setColor(ColorsEnum.RED)
+            
+            return await interaction.reply({embeds: [embed], ephemeral: true})
         }
+
+        const embed = new EmbedBuilder()
+            .setTitle("**Unlooped!**")
+            .setColor(ColorsEnum.GREEN)
+
+        await interaction.reply({embeds: [embed]})
+
     }
 }
